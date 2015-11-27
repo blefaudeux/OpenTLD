@@ -49,6 +49,21 @@ if(APPLE)
 	add_definitions(-DHAVE_XLOCALE_H)
 endif(APPLE)
 
+if(WIN32)
+	find_path(OpenCV_DIR OpenCVConfig.cmake PATHS 
+			  "C:/OpenCV/opencv-2.4.9/build" # PC Amaury Mines
+			  # add your OpenCV path here : 
+			  )
+	if( ${OpenCV_DIR} STREQUAL "OpenCV_DIR-NOTFOUND" ) 
+		message( FATAL_ERROR "FATAL_ERROR : OpenCV is not found, Please insert your OpenCV Path in pl_utils.cmake")
+	else ()
+		message(STATUS "Your OpenCV_DIR is ${OpenCV_DIR}")
+	endif()
+	find_package(OpenCV REQUIRED)
+else()
+	find_package(OpenCV REQUIRED)
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgomp")
