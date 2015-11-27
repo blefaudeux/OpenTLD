@@ -8,3 +8,4 @@ TODO
 cmake_install.cmake
 *.a
 
+build_vc10/
