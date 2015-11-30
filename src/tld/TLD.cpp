@@ -111,6 +111,12 @@ void TLD::processImage(Mat img) {
 
 }
 
+
+void TLD::drawDetection( IplImage * img) const {
+	detectorCascade->drawDetection(img);
+}
+
+
 void TLD::fuseHypotheses() {
 	Rect* trackerBB = medianFlowTracker->trackerBB;
 	int numClusters = detectorCascade->detectionResult->numClusters;
@@ -524,6 +530,5 @@ void TLD::readFromFile(const char * path) {
 	ec->initFeatureOffsets();
 
 }
-
 
 } /* namespace tld */

@@ -65,6 +65,7 @@ public:
 	void processImage(Mat img);
 	void writeToFile(const char * path);
 	void readFromFile(const char * path);
+	void drawDetection(IplImage * img) const;
 };
 
 } /* namespace tld */

@@ -113,6 +113,7 @@
 
 		if(!skipProcessingOnce) {
 			tld->processImage(img);
+			
 		} else {
 			skipProcessingOnce = false;
 		}
@@ -161,7 +162,9 @@
 				std::string s3 = sin2.str();
 				std::string cmd = "./click -x " + s2 + " -y " + s3;
 				//system(cmd.c_str());
+				tld->drawDetection(img);
 				cvRectangle(img,cvPoint(tld->currBB->x,tld->currBB->y),cvPoint(tld->currBB->x+tld->currBB->width,tld->currBB->y+tld->currBB->height),CV_RGB(0,255,255),2);
+				
 			}
 
 			CvFont font;
