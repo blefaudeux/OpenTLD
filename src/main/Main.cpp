@@ -112,6 +112,7 @@
 		}
 
 		if(!skipProcessingOnce) {
+			cv::blur(Mat(img),Mat(img),cv::Size(3,3));
 			tld->processImage(img);
 			
 		} else {
