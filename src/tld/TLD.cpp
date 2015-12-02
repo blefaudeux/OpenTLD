@@ -306,7 +306,6 @@ void TLD::learn() {
 		//TODO: Somewhere here image warping might be possible
 		detectorCascade->ensembleClassifier->learn(currImg, &detectorCascade->windows[TLD_WINDOW_SIZE*idx], true, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
 	}
-	drawPosterios();
 
 	for(size_t i = 0; i < negativeIndicesForNN.size(); i++) {
 		int idx = negativeIndicesForNN.at(i);
@@ -579,7 +578,7 @@ static CvScalar * DRAW_vector_map(int size) {
 	return &COLOR[0];
 }
 
-void TLD::drawPosterios() {
+Mat TLD::drawPosterios() {
 	int T = detectorCascade->ensembleClassifier->numTrees;
 	int I = detectorCascade->ensembleClassifier->numIndices;
 	if(_img_posterios == NULL) {
@@ -598,7 +597,8 @@ void TLD::drawPosterios() {
 	}
 	Mat img4;
 	cv::resize(Mat(_img_posterios),img4,cv::Size(I*2,T*10),0.,0.,0);
-	imshow("Posterios",img4);
+	//imshow("Posterios",img4);
+	return img4;
 }
 
 } /* namespace tld */

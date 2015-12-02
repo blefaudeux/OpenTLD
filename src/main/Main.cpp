@@ -164,7 +164,9 @@
 				//system(cmd.c_str());
 				tld->drawDetection(img);
 				cvRectangle(img,cvPoint(tld->currBB->x,tld->currBB->y),cvPoint(tld->currBB->x+tld->currBB->width,tld->currBB->y+tld->currBB->height),CV_RGB(0,255,255),2);
-				
+				Mat img_desciptor = tld->drawPosterios();
+				Mat mat(img);
+				img_desciptor.copyTo(mat(cv::Rect(0,0,img_desciptor.cols,img_desciptor.rows)));
 			}
 
 			CvFont font;
