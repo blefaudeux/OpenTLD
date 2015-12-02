@@ -190,7 +190,7 @@ void EnsembleClassifier::updatePosteriors(int *featureVector, int positive, int 
 	}
 }
 
-void EnsembleClassifier::learn(Mat img, int * boundary, int positive, int * featureVector) {
+void EnsembleClassifier::learn(int positive, int * featureVector) {
     if(!enabled) return;
 
 	float conf = calcConfidence(featureVector);
