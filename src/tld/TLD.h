@@ -66,6 +66,10 @@ public:
 	void writeToFile(const char * path);
 	void readFromFile(const char * path);
 	void drawDetection(IplImage * img) const;
+
+private :
+	IplImage * _img_posterios;
+	void drawPosterios();
 };
 
 } /* namespace tld */

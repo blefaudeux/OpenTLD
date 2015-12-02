@@ -41,7 +41,7 @@ namespace tld {
 
 EnsembleClassifier::EnsembleClassifier() {
 	numTrees=10;
-	numFeatures = 13;
+	numFeatures = 8;
 	enabled = true;
 }
 
@@ -177,7 +177,7 @@ bool EnsembleClassifier::filter(int i)  {
 void EnsembleClassifier::updatePosterior(int treeIdx, int idx, int positive, int amount) {
 	int arrayIndex = treeIdx * numIndices + idx;
 	(positive) ? positives[arrayIndex] += amount : negatives[arrayIndex] += amount;
-	posteriors[arrayIndex] = ((float) positives[arrayIndex]) / (positives[arrayIndex] + negatives[arrayIndex]) / 10.0;
+	posteriors[arrayIndex] = ((float) positives[arrayIndex]) / (positives[arrayIndex] + negatives[arrayIndex]) ;// / 10.0;
 }
 
 void EnsembleClassifier::updatePosteriors(int *featureVector, int positive, int amount) {
