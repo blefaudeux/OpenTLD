@@ -286,7 +286,7 @@ void DetectorCascade::detect(Mat img) {
 			continue;
 		}
 
-		detectionResult->confidentIndices->push_back(i);
+		detectionResult->confidentIndices.push_back(i);
 
 
 	}
@@ -297,8 +297,8 @@ void DetectorCascade::detect(Mat img) {
 }
 
 void DetectorCascade::drawDetection(IplImage * img) const {
-	for (int i = 0 ; i < detectionResult->confidentIndices->size() ;i++) {
-		int idx = detectionResult->confidentIndices->at(i);
+	for (int i = 0 ; i < detectionResult->confidentIndices.size() ;i++) {
+		int idx = detectionResult->confidentIndices.at(i);
 		int * bb = &windows[TLD_WINDOW_SIZE*idx];
 		int x = bb[0];
 		int y = bb[1];

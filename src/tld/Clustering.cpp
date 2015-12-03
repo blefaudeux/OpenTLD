@@ -75,7 +75,7 @@ void Clustering::calcMeanRect(vector<int> * indices) {
 void Clustering::calcDistances(float * distances) {
 	float * distances_tmp = distances;
 
-	vector<int> confidentIndices = *detectionResult->confidentIndices;
+	vector<int> & confidentIndices = detectionResult->confidentIndices;
 
 	size_t indices_size = confidentIndices.size();
 
@@ -93,13 +93,13 @@ void Clustering::calcDistances(float * distances) {
 }
 
 void Clustering::clusterConfidentIndices() {
-	int numConfidentIndices = detectionResult->confidentIndices->size();
+	int numConfidentIndices = detectionResult->confidentIndices.size();
 	float * distances = new float[numConfidentIndices*(numConfidentIndices-1)/2];
 	calcDistances(distances);
 	int * clusterIndices = new int[numConfidentIndices];
 	cluster(distances, clusterIndices);
 	if(detectionResult->numClusters == 1) {
-		calcMeanRect(detectionResult->confidentIndices);
+		calcMeanRect(&detectionResult->confidentIndices);
 		//TODO: Take the maximum confidence as the result confidence.
 	}
 
@@ -107,7 +107,7 @@ void Clustering::clusterConfidentIndices() {
 }
 
 void Clustering::cluster(float * distances, int * clusterIndices) {
-	int numConfidentIndices = detectionResult->confidentIndices->size();
+	int numConfidentIndices = detectionResult->confidentIndices.size();
 
 	if(numConfidentIndices == 1) {
 		clusterIndices[0] = 0;

@@ -39,7 +39,7 @@ public:
 	bool containsValidData;
 	vector<Rect>* fgList;
 	float * posteriors; /* Contains the posteriors for each slding window. Is of size numWindows. Allocated by tldInitClassifier. */
-	vector<int>* confidentIndices;
+	vector<int> confidentIndices;
 	int * featureVectors;
 	float * variances;
 	int numClusters;
