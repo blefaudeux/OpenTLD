@@ -286,7 +286,7 @@ void DetectorCascade::detect(Mat img) {
 			continue;
 		}
 
-		detectionResult->confidentIndices->push_back(i);
+		detectionResult->confidentIndices.push_back(i);
 
 
 	}
@@ -294,6 +294,18 @@ void DetectorCascade::detect(Mat img) {
 	clustering->clusterConfidentIndices();
 
 	detectionResult->containsValidData = true;
+}
+
+void DetectorCascade::drawDetection(IplImage * img) const {
+	for (int i = 0 ; i < detectionResult->confidentIndices.size() ;i++) {
+		int idx = detectionResult->confidentIndices.at(i);
+		int * bb = &windows[TLD_WINDOW_SIZE*idx];
+		int x = bb[0];
+		int y = bb[1];
+		int w = bb[2];
+		int h = bb[3];
+		cvRectangle(img,cvPoint(x,y),cvPoint(x+w,y+h),CV_RGB(255,0,0),1);
+	}
 }
 
 } /* namespace tld */

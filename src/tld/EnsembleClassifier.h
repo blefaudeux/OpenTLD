@@ -72,7 +72,7 @@ public:
 	void nextIteration(Mat img);
 	void classifyWindow(int windowIdx);
 	void updatePosterior(int treeIdx, int idx, int positive, int amount);
-	void learn(Mat img, int * boundary, int positive, int * featureVector);
+	void learn(int positive, int * featureVector);
 	bool filter(int i);
 };
 

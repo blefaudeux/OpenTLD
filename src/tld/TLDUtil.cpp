@@ -52,8 +52,8 @@ void tldNormalizeImg(Mat img, float * output) {
 
 	unsigned char * imgData = (unsigned char *)result.data;
 
-	for(int i = 0; i < 15; i++) {
-		for(int j = 0; j < 15; j++) {
+	for(int i = 0; i < size; i++) {
+		for(int j = 0; j < size; j++) {
 			mean += imgData[j*result.step+ i];
 		}
 	}
@@ -63,7 +63,7 @@ void tldNormalizeImg(Mat img, float * output) {
 
 	for(int i = 0; i < size; i++) {
 		for(int j = 0; j < size; j++) {
-			output[j*15+i] = imgData[j*result.step + i] - mean;
+			output[j*size+i] = imgData[j*result.step + i] - mean;
 		}
 	}
 

@@ -125,7 +125,7 @@ IplImage * imAcqGetImgByCurrentTime(ImAcq * imAcq) {
 IplImage * imAcqGetImg(ImAcq * imAcq) {
 
 	IplImage * img = NULL;
-
+	
 	if(imAcq->method == IMACQ_CAM || imAcq->method == IMACQ_VID) {
 		img = imAcqGrab(imAcq->capture);
 	}
@@ -140,6 +140,10 @@ IplImage * imAcqGetImg(ImAcq * imAcq) {
 
 	imAcqAdvance(imAcq);
 
+// 	IplImage * ipl_out = cvCreateImage(cvSize(img->width/2,img->height/2),8,3);
+// 	cvResize(img,ipl_out,0);
+// 	cvReleaseImage(&img);
+// 	return ipl_out;
 	return img;
 }
 

@@ -22,7 +22,7 @@
  *  Created on: Nov 17, 2011
  *      Author: Georg Nebehay
  */
-
+#include "highgui.h"
 #include "TLD.h"
 #include "NNClassifier.h"
 #include "TLDUtil.h"
@@ -46,11 +46,12 @@ TLD::TLD() {
 	nnClassifier = detectorCascade->nnClassifier;
 
 	medianFlowTracker = new MedianFlowTracker();
+	_img_posterios = NULL;
 }
 
 TLD::~TLD() {
 	storeCurrentData();
-
+	if(_img_posterios)cvReleaseImage(&_img_posterios);
 	delete detectorCascade;
 	delete medianFlowTracker;
 }
@@ -106,10 +107,14 @@ void TLD::processImage(Mat img) {
 	}
 
 	fuseHypotheses();
-
 	learn();
-
 }
+
+
+void TLD::drawDetection( IplImage * img) const {
+	detectorCascade->drawDetection(img);
+}
+
 
 void TLD::fuseHypotheses() {
 	Rect* trackerBB = medianFlowTracker->trackerBB;
@@ -209,7 +214,7 @@ void TLD::initialLearning() {
 		int idx = positiveIndices.at(i).first;
 		//Learn this bounding box
 		//TODO: Somewhere here image warping might be possible
-		detectorCascade->ensembleClassifier->learn(currImg, &detectorCascade->windows[TLD_WINDOW_SIZE*idx], true, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
+		detectorCascade->ensembleClassifier->learn(true, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
 	}
 
 	srand(1); //TODO: This is not guaranteed to affect random_shuffle
@@ -289,18 +294,17 @@ void TLD::learn() {
 
 
 	int numIterations = min<size_t>(positiveIndices.size(), 10); //Take at most 10 bounding boxes (sorted by overlap)
-
 	for(size_t i = 0; i < negativeIndices.size(); i++) {
 		int idx = negativeIndices.at(i);
 		//TODO: Somewhere here image warping might be possible
-		detectorCascade->ensembleClassifier->learn(currImg, &detectorCascade->windows[TLD_WINDOW_SIZE*idx], false, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
+		detectorCascade->ensembleClassifier->learn(false, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
 	}
 
 	//TODO: Randomization might be a good idea
 	for(int i = 0; i < numIterations; i++) {
 		int idx = positiveIndices.at(i).first;
 		//TODO: Somewhere here image warping might be possible
-		detectorCascade->ensembleClassifier->learn(currImg, &detectorCascade->windows[TLD_WINDOW_SIZE*idx], true, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
+		detectorCascade->ensembleClassifier->learn(true, &detectionResult->featureVectors[detectorCascade->numTrees*idx]);
 	}
 
 	for(size_t i = 0; i < negativeIndicesForNN.size(); i++) {
@@ -525,5 +529,76 @@ void TLD::readFromFile(const char * path) {
 
 }
 
+static void hsv2rgb(double h,double s,double v,unsigned char *R,unsigned char*G,unsigned char *B) {
+	double r=0,g=0,b=0;
+	double f,p,q,t;
+	int i;
+
+	if( s == 0 ) { r = v;g = v;b = v; }
+	else {
+		if(h >= 360.)
+			h = 0.0;
+		h /= 60.;
+		i = (int) h;
+		f = h - i;
+		p = v*(1-s);
+		q = v*(1-(s*f));
+		t = v*(1-s*(1-f));
+		switch(i) {
+		case 0: r = v;g = t;b = p;break;
+		case 1: r = q;g = v;b = p;break;
+		case 2: r = p;g = v;b = t;break;
+		case 3: r = p;g = q;b = v;break;
+		case 4: r = t;g = p;b = v;break;
+		case 5: r = v;g = p;b = q;break;
+		default: r = 1.0; b = 1.0;b = 1.0; break;
+		}
+	}
+	*R = (unsigned char)(255*r);
+	*G = (unsigned char)(255*g);
+	*B = (unsigned char)(255*b);
+}
+
+#define MAX_NB_COLOR 1024
+static CvScalar COLOR[MAX_NB_COLOR];
+static CvScalar * DRAW_vector_map(int size) {
+	size = MIN(size , 1024);
+	double e = 240./size;
+	double h = 0.;
+	double s = 1.;
+	double v = 1.;
+	int i;
+
+	for ( i = size-1 ; i >=0 ; i--) {
+		unsigned char R,G,B;
+		hsv2rgb(h,s,v,&R,&G,&B);
+		COLOR[i] = CV_RGB(R,G,B);
+		h += e;
+	}
+	return &COLOR[0];
+}
+
+Mat TLD::drawPosterios() {
+	int T = detectorCascade->ensembleClassifier->numTrees;
+	int I = detectorCascade->ensembleClassifier->numIndices;
+	if(_img_posterios == NULL) {
+		_img_posterios = cvCreateImage(cvSize(I,T),8,3);
+	}
+	CvScalar * c = DRAW_vector_map(1000);
+	for (int t = 0 ; t < T ;t++) {
+		unsigned char * ptr = (unsigned char *)_img_posterios->imageData + t*_img_posterios->widthStep;
+		for (int i = 0 ; i < I ; i++) {
+			float p = MIN(0.999,detectorCascade->ensembleClassifier->posteriors[i + t * I]*10);
+			CvScalar color = c[int(p*999)];
+			ptr[i*3+0] = color.val[0];
+			ptr[i*3+1] = color.val[1];
+			ptr[i*3+2] = color.val[2];
+		}
+	}
+	Mat img4;
+	cv::resize(Mat(_img_posterios),img4,cv::Size(I*2,T*10),0.,0.,0);
+	//imshow("Posterios",img4);
+	return img4;
+}
 
 } /* namespace tld */

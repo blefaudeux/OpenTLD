@@ -112,7 +112,9 @@
 		}
 
 		if(!skipProcessingOnce) {
+			cv::blur(Mat(img),Mat(img),cv::Size(3,3));
 			tld->processImage(img);
+			
 		} else {
 			skipProcessingOnce = false;
 		}
@@ -160,14 +162,19 @@
 				sin2 << (y_avg);
 				std::string s3 = sin2.str();
 				std::string cmd = "./click -x " + s2 + " -y " + s3;
-				system(cmd.c_str());
+				//system(cmd.c_str());
+				tld->drawDetection(img);
+				cvRectangle(img,cvPoint(tld->currBB->x,tld->currBB->y),cvPoint(tld->currBB->x+tld->currBB->width,tld->currBB->y+tld->currBB->height),CV_RGB(0,255,255),2);
+				Mat img_desciptor = tld->drawPosterios();
+				Mat mat(img);
+				img_desciptor.copyTo(mat(cv::Rect(0,0,img_desciptor.cols,img_desciptor.rows)));
 			}
 
 			CvFont font;
 			cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, .5, .5, 0, 1, 8);
 			cvRectangle(img, cvPoint(0,0), cvPoint(img->width,50), black, CV_FILLED, 8, 0);
 			cvPutText(img, string, cvPoint(25,25), &font, white);
-
+			
 			if(showForeground) {
 
 				for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList->size(); i++) {

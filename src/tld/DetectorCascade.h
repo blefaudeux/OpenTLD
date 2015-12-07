@@ -91,6 +91,7 @@ public:
 	void release();
 	void cleanPreviousData();
 	void detect(Mat img);
+	void drawDetection(IplImage * img) const;
 };
 
 } /* namespace tld */
