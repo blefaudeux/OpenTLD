@@ -74,10 +74,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgomp")
 
 include_directories(src/cvblobs src/imacq src/config src/tld src/mftracker src/main)
 
-if(NOT WIN32)
-    include_directories("/usr/include")
-endif()
-
 #-------------------------------------------------------------------------------
 #add subdirectories
 add_subdirectory(src/imacq)
