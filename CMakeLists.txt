@@ -62,6 +62,7 @@ if(WIN32)
 	find_package(OpenCV REQUIRED)
 else()
 	find_package(OpenCV REQUIRED)
+    include_directories(${OpenCV_INCLUDE_DIRS})
     message(STATUS "OpenCV_DIR is ${OpenCV_DIR}")
     message(STATUS "OpenCV includes are ${OpenCV_INCLUDE_DIRS}")
     message(STATUS "OpenCV libs are ${OpenCV_LIBS}")
@@ -72,6 +73,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgomp")
 
 include_directories(src/cvblobs src/imacq src/config src/tld src/mftracker src/main)
+
+if(NOT WIN32)
+    include_directories("/usr/include")
+endif()
 
 #-------------------------------------------------------------------------------
 #add subdirectories
