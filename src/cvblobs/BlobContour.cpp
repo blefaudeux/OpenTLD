@@ -1,5 +1,7 @@
 #include "BlobContour.h"
-#include "cxcore.h"
+#include <opencv/cxcore.h>
+#include <opencv/cvwimage.h>
+#include <opencv/cv.hpp>
 
 CBlobContour::CBlobContour()
 {
@@ -82,20 +84,6 @@ CBlobContour& CBlobContour::operator=( const CBlobContour &source )
 	return *this;
 }
 
-
-/**
-- FUNCIÓ: AddChainCode
-- FUNCIONALITAT: Add chain code to contour
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/06
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
 void CBlobContour::AddChainCode(t_chainCode chaincode)
 {
 	cvSeqPush(m_contour, &chaincode);
@@ -116,20 +104,6 @@ void CBlobContour::ResetChainCode()
 	}
 }
 
-/**
-- FUNCIÓ: GetPerimeter
-- FUNCIONALITAT: Get perimeter from chain code. Diagonals sum sqrt(2) and horizontal and vertical codes 1
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/30
-- MODIFICACIÓ: Data. Autor. Descripció.
-- NOTA: Algorithm derived from "Methods to estimate area and perimeters of blob-like objects: A comparison", L.Yang
-*/
 double CBlobContour::GetPerimeter()
 {
 	// is calculated?
@@ -146,20 +120,6 @@ double CBlobContour::GetPerimeter()
 	return m_perimeter;
 }
 
-/**
-- FUNCIÓ: GetArea
-- FUNCIONALITAT: Computes area from chain code
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- May give negative areas for clock wise contours
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/30
-- MODIFICACIÓ: Data. Autor. Descripció.
-- NOTA: Algorithm derived from "Properties of contour codes", G.R. Wilson
-*/
 double CBlobContour::GetArea()
 {
 	// is calculated?

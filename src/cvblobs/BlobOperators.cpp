@@ -1,56 +1,12 @@
 #include <limits.h>
 #include "BlobOperators.h"
+#include <opencv/cv.hpp>
 
-/***************************************************************************
-  Implementació de les classes per al càlcul de característiques sobre el blob
-
-  Implementation of the helper classes to perform operations on blobs
-/**************************************************************************/
-
-/**
-- FUNCTION: Moment
-- FUNCTIONALITY: Calculates the pq moment of the blob
-- PARAMETERS:
-- RESULT:
-	- returns the pq moment or 0 if the moment it is not implemented
-- RESTRICTIONS:
-	- Currently, implemented moments up to 3
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 20-07-2004.
-- MODIFICATION: Date. Author. Description.
-*/
 double CBlobGetMoment::operator()(CBlob &blob)
 {
 	return blob.Moment(m_p, m_q);
 }
 
-/**
-- FUNCIÓ: HullPerimeter
-- FUNCIONALITAT: Calcula la longitud del perimetre convex del blob.
-			   Fa servir la funció d'OpenCV cvConvexHull2 per a 
-			   calcular el perimetre convex.
-			   
-- PARÀMETRES:
-- RESULTAT:
-	- retorna la longitud del perímetre convex del blob. Si el blob no té coordenades
-	  associades retorna el perímetre normal del blob.
-- RESTRICCIONS:
-- AUTOR: Ricard Borràs
-- DATA DE CREACIÓ: 20-07-2004.
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
-/**
-- FUNCTION: CBlobGetHullPerimeter
-- FUNCTIONALITY: Calculates the convex hull perimeter of the blob
-- PARAMETERS:
-- RESULT:
-	- returns the convex hull perimeter of the blob or the perimeter if the 
-	blob edges could not be retrieved
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
 double CBlobGetHullPerimeter::operator()(CBlob &blob)
 {
 	CvSeq *convexHull;
@@ -85,16 +41,7 @@ double CBlobGetHullArea::operator()(CBlob &blob)
 	return area;
 }
 
-/**
-- FUNCTION: CBlobGetMinXatMinY
-- FUNCTIONALITY: Calculates the minimum X on the minimum Y
-- PARAMETERS:
-- RESULT:
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
+
 double CBlobGetMinXatMinY::operator()(CBlob &blob)
 {
 	double result = LONG_MAX;
@@ -120,16 +67,7 @@ double CBlobGetMinXatMinY::operator()(CBlob &blob)
 	return result;
 }
 
-/**
-- FUNCTION: CBlobGetMinXatMinY
-- FUNCTIONALITY: Calculates the minimum Y on the maximum X
-- PARAMETERS:
-- RESULT:
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
+
 double CBlobGetMinYatMaxX::operator()(CBlob &blob)
 {
 	double result = LONG_MAX;
@@ -155,16 +93,7 @@ double CBlobGetMinYatMaxX::operator()(CBlob &blob)
 	return result;
 }
 
-/**
-- FUNCTION: CBlobGetMaxXatMaxY
-- FUNCTIONALITY: Calculates the maximum X on the maximum Y
-- PARAMETERS:
-- RESULT:
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
+
 double CBlobGetMaxXatMaxY::operator()(CBlob &blob)
 {
 	double result = LONG_MIN;

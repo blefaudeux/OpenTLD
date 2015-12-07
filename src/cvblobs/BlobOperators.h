@@ -3,18 +3,9 @@
 
 #include "blob.h"
 
-/**************************************************************************
-		Definició de les classes per a fer operacions sobre els blobs
-
-		Helper classes to perform operations on blobs
-**************************************************************************/
-
-//! Factor de conversió de graus a radians
 #define DEGREE2RAD		(CV_PI / 180.0)
 
 
-//! Classe d'on derivarem totes les operacions sobre els blobs
-//! Interface to derive all blob operations
 class COperadorBlob
 {
 public:

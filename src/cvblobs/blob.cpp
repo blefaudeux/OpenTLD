@@ -15,7 +15,8 @@ MODIFICATIONS (Modification, Author, Date):
 
 
 #include "blob.h"
-
+#include <opencv/cxcore.h>
+#include <opencv/cv.h>
 
 CBlob::CBlob()
 {
@@ -134,26 +135,11 @@ void CBlob::AddInternalContour( const CBlobContour &newContour )
 	m_internalContours.push_back(newContour);
 }
 
-//! Indica si el blob està buit ( no té cap info associada )
-//! Shows if the blob has associated information
 bool CBlob::IsEmpty()
 {
 	return GetExternalContour()->m_contour == NULL;
 }
 
-/**
-- FUNCIÓ: Area
-- FUNCIONALITAT: Get blob area, ie. external contour area minus internal contours area
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/30
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
 double CBlob::Area()
 {
 	double area;
@@ -171,19 +157,6 @@ double CBlob::Area()
 	return area;
 }
 
-/**
-- FUNCIÓ: Perimeter
-- FUNCIONALITAT: Get blob perimeter, ie. sum of the lenght of all the contours
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/30
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
 double CBlob::Perimeter()
 {
 	double perimeter;
@@ -202,20 +175,6 @@ double CBlob::Perimeter()
 
 }
 
-/**
-- FUNCIÓ: Exterior
-- FUNCIONALITAT: Return true for extern blobs
-- PARÀMETRES:
-	- xBorder: true to consider blobs touching horizontal borders as extern
-	- yBorder: true to consider blobs touching vertical borders as extern
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/06
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
 int	CBlob::Exterior(IplImage *mask, bool xBorder /* = true */, bool yBorder /* = true */)
 {
 	if (ExternPerimeter(mask, xBorder, yBorder ) > 0 )
@@ -225,24 +184,7 @@ int	CBlob::Exterior(IplImage *mask, bool xBorder /* = true */, bool yBorder /* =
 	
 	return 0;	 
 }
-/**
-- FUNCIÓ: ExternPerimeter
-- FUNCIONALITAT: Get extern perimeter (perimeter touching image borders)
-- PARÀMETRES:
-	- maskImage: if != NULL, counts maskImage black pixels as external pixels and contour points touching
-				 them are counted as external contour points.
-	- xBorder: true to consider blobs touching horizontal borders as extern
-	- yBorder: true to consider blobs touching vertical borders as extern
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/05
-- MODIFICACIÓ: Data. Autor. Descripció.
-- NOTA: If CBlobContour::GetContourPoints aproximates contours with a method different that NONE,
-		this function will not give correct results
-*/
+
 double CBlob::ExternPerimeter( IplImage *maskImage, bool xBorder /* = true */, bool yBorder /* = true */)
 {
 	t_PointList externContour, externalPoints;
@@ -348,7 +290,7 @@ double CBlob::ExternPerimeter( IplImage *maskImage, bool xBorder /* = true */, b
 			if( delta > 2 )
 			{
 				cvEndWriteSeq( &writer );
-				m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
+                m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
 				
 				cvClearSeq( externalPoints );
 				cvStartAppendToSeq( externalPoints, &writer );
@@ -364,7 +306,7 @@ double CBlob::ExternPerimeter( IplImage *maskImage, bool xBorder /* = true */, b
 
 	cvEndWriteSeq( &writer );
 
-	m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
+    m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
 
 	cvClearSeq( externalPoints );
 
@@ -393,19 +335,6 @@ double CBlob::Moment(int p, int q)
 	return moment;
 }
 
-/**
-- FUNCIÓ: Mean
-- FUNCIONALITAT: Get blob mean color in input image
-- PARÀMETRES:
-	- image: image from gray color are extracted
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/06
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
 double CBlob::Mean( IplImage *image )
 {
 	// it is calculated?
@@ -472,19 +401,7 @@ double CBlob::StdDev( IplImage *image )
 
 	return m_stdDevGray;
 }
-/**
-- FUNCIÓ: GetBoundingBox
-- FUNCIONALITAT: Get bounding box (without rotation) of a blob
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/06
-- MODIFICACIÓ: Data. Autor. Descripció.
-*/
+
 CvRect CBlob::GetBoundingBox()
 {
 	// it is calculated?
@@ -538,20 +455,6 @@ CvRect CBlob::GetBoundingBox()
 	return m_boundingBox;
 }
 
-/**
-- FUNCIÓ: GetEllipse
-- FUNCIONALITAT: Calculates bounding ellipse of external contour points
-- PARÀMETRES:
-	- 
-- RESULTAT:
-	- 
-- RESTRICCIONS:
-	- 
-- AUTOR: rborras
-- DATA DE CREACIÓ: 2008/05/06
-- MODIFICACIÓ: Data. Autor. Descripció.
-- NOTA: Calculation is made using second order moment aproximation
-*/
 CvBox2D CBlob::GetEllipse()
 {
 	// it is calculated?
@@ -632,38 +535,13 @@ CvBox2D CBlob::GetEllipse()
 
 }
 
-/**
-- FUNCTION: FillBlob
-- FUNCTIONALITY: 
-	- Fills the blob with a specified colour
-- PARAMETERS:
-	- imatge: where to paint
-	- color: colour to paint the blob
-- RESULT:
-	- modifies input image and returns the seed point used to fill the blob
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
 void CBlob::FillBlob( IplImage *imatge, CvScalar color, int offsetX /*=0*/, int offsetY /*=0*/) 					  
 {
 	cvDrawContours( imatge, m_externalContour.GetContourPoints(), color, color,0, CV_FILLED, 8 );
 }
 
 
-/**
-- FUNCTION: GetConvexHull
-- FUNCTIONALITY: Calculates the convex hull polygon of the blob
-- PARAMETERS:
-	- dst: where to store the result
-- RESULT:
-	- true if no error ocurred
-- RESTRICTIONS:
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
+
 t_PointList CBlob::GetConvexHull()
 {
 	CvSeq *convexHull = NULL;
@@ -675,18 +553,6 @@ t_PointList CBlob::GetConvexHull()
 	return convexHull;
 }
 
-/**
-- FUNCTION: JoinBlob
-- FUNCTIONALITY: Add's external contour to current external contour
-- PARAMETERS:
-	- blob: blob from which extract the added external contour
-- RESULT:
-	- true if no error ocurred
-- RESTRICTIONS: Only external contours are added
-- AUTHOR: Ricard Borràs
-- CREATION DATE: 25-05-2005.
-- MODIFICATION: Date. Author. Description.
-*/
 void CBlob::JoinBlob( CBlob *blob )
 {
 	CvSeqWriter writer;
