@@ -9,6 +9,10 @@ cmake_install.cmake
 *.a
 *.user
 *.cbp
+*.config
+*.creator
+*.files
+*.includes
 
 build_vc10/
 build/tld
