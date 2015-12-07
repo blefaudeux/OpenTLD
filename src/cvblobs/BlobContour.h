@@ -6,7 +6,7 @@
 
 #include <opencv/cv.hpp>
 #include <opencv/cxcore.hpp>
-
+#include <opencv/highgui.h>
 
 //! Type of chain codes
 typedef unsigned char t_chainCode;

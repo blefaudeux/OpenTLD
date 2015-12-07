@@ -17,6 +17,7 @@ addons:
     packages:
     - g++
     - libopencv-dev
+    - libcv-dev
 
 notifications:
   email: none
