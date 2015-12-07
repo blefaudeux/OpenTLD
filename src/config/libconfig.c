@@ -94,11 +94,6 @@ static void __config_locale_override(void)
 
   locale_t loc = newlocale(LC_NUMERIC, "C", NULL);
   uselocale(loc);
-
-#else
-
-#warning "No way to modify calling thread's locale!"
-
 #endif
 }
 
@@ -115,11 +110,6 @@ static void __config_locale_restore(void)
 
   locale_t loc = uselocale(LC_GLOBAL_LOCALE);
   freelocale(loc);
-
-#else
-
-#warning "No way to modify calling thread's locale!"
-
 #endif
 }
 
