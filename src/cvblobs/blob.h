@@ -18,10 +18,6 @@ MODIFICATIONS (Modification, Author, Date):
 #ifndef CBLOB_INSPECTA_INCLUDED
 #define CBLOB_INSPECTA_INCLUDED
 
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/core/core.hpp>
-
 #include "BlobLibraryConfiguration.h"
 #include "BlobContour.h"
 
