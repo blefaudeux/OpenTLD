@@ -177,8 +177,8 @@
 			
 			if(showForeground) {
 
-				for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList->size(); i++) {
-					Rect r = tld->detectorCascade->detectionResult->fgList->at(i);
+                for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList.size(); i++) {
+                    Rect r = tld->detectorCascade->detectionResult->fgList[i];
 					cvRectangle(img, r.tl(),r.br(), white, 1);
 				}
 

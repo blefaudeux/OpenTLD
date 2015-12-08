@@ -239,24 +239,20 @@ public:
 	}
 };
 
-//! Classe per calcular el moment PQ del blob
-//! Class to calculate the P,Q moment of a blob
 class CBlobGetMoment: public COperadorBlob
 {
 public:
-	//! Constructor estàndard
-	//! Standard constructor (gets the 00 moment)
 	CBlobGetMoment()
 	{
 		m_p = m_q = 0;
-	}
-	//! Constructor: indiquem el moment p,q a calcular
-	//! Constructor: gets the PQ moment
+    }
+
 	CBlobGetMoment( int p, int q )
 	{
 		m_p = p;
 		m_q = q;
-	};
+    }
+
 	double operator()(CBlob &blob);
 	const char *GetNom()
 	{
@@ -264,12 +260,10 @@ public:
 	}
 
 private:
-	//! moment que volem calcular
 	int m_p, m_q;
 };
 
-//! Classe per calcular el perimetre del poligon convex d'un blob
-//! Class to calculate the convex hull perimeter of a blob
+
 class CBlobGetHullPerimeter: public COperadorBlob
 {
 public:
@@ -280,8 +274,6 @@ public:
 	}
 };
 
-//! Classe per calcular l'àrea del poligon convex d'un blob
-//! Class to calculate the convex hull area of a blob
 class CBlobGetHullArea: public COperadorBlob
 {
 public:
@@ -292,8 +284,6 @@ public:
 	}
 };
 
-//! Classe per calcular la x minima en la y minima
-//! Class to calculate the minimum x on the minimum y
 class CBlobGetMinXatMinY: public COperadorBlob
 {
 public:
@@ -304,8 +294,6 @@ public:
 	}
 };
 
-//! Classe per calcular la y minima en la x maxima
-//! Class to calculate the minimum y on the maximum x
 class CBlobGetMinYatMaxX: public COperadorBlob
 {
 public:
@@ -316,8 +304,6 @@ public:
 	}
 };
 
-//! Classe per calcular la x maxima en la y maxima
-//! Class to calculate the maximum x on the maximum y
 class CBlobGetMaxXatMaxY: public COperadorBlob
 {
 public:
@@ -328,8 +314,6 @@ public:
 	}
 };
 
-//! Classe per calcular la y maxima en la x minima
-//! Class to calculate the maximum y on the minimum y
 class CBlobGetMaxYatMinX: public COperadorBlob
 {
 public:
@@ -340,8 +324,6 @@ public:
 	}
 };
 
-//! Classe per a calcular la x mínima
-//! Class to get the minimum x
 class CBlobGetMinX: public COperadorBlob
 {
 public:
@@ -355,8 +337,6 @@ public:
 	}
 };
 
-//! Classe per a calcular la x màxima
-//! Class to get the maximum x
 class CBlobGetMaxX: public COperadorBlob
 {
 public:
@@ -370,8 +350,6 @@ public:
 	}
 };
 
-//! Classe per a calcular la y mínima
-//! Class to get the minimum y
 class CBlobGetMinY: public COperadorBlob
 {
 public:
@@ -385,8 +363,6 @@ public:
 	}
 };
 
-//! Classe per a calcular la y màxima
-//! Class to get the maximum y
 class CBlobGetMaxY: public COperadorBlob
 {
 public:
@@ -401,8 +377,6 @@ public:
 };
 
 
-//! Classe per calcular l'elongacio d'un blob
-//! Class to calculate the elongation of the blob
 class CBlobGetElongation: public COperadorBlob
 {
 public:

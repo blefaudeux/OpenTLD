@@ -4,9 +4,9 @@
 
 #include "list"
 
-#include <opencv/cv.hpp>
-#include <opencv/cxcore.hpp>
-#include <opencv/highgui.h>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 //! Type of chain codes
 typedef unsigned char t_chainCode;
@@ -27,38 +27,36 @@ class CBlobContour
 	friend class CBlobProperties; //AO
 	
 public:
-	//! Constructors
 	CBlobContour();
-	CBlobContour(CvPoint startPoint, CvMemStorage *storage );
-	//! Copy constructor
-	CBlobContour( CBlobContour *source );
+    CBlobContour(const std::vector<cv::Point2i> &contour);
+
+    CBlobContour( CBlobContour *source );
 
 	~CBlobContour();
-	//! Assigment operator
-	CBlobContour& operator=( const CBlobContour &source );
 
-	//! Add chain code to contour
-	void AddChainCode(t_chainCode code);
+    CBlobContour& operator=( const CBlobContour &source );
+
+    void addContourPoints(std::vector<cv::Point2i> const & newPoints);
 
 	//! Return freeman chain coded contour
-	t_chainCodeList GetChainCode()
+    std::vector<cv::Point2i> const & GetChainCode()
 	{
 		return m_contour;
 	}
 
 	bool IsEmpty()
 	{
-		return m_contour == NULL || m_contour->total == 0;
+        return m_contour.empty();
 	}
 
 	//! Return all contour points
-	t_chainCodeList GetContourPoints();
+    std::vector<cv::Point2i> const & GetContourPoints() const;
 
 protected:	
 
 	CvPoint GetStartPoint() const
 	{
-		return m_startPoint;
+        return m_contour.front();
 	}
 
 	//! Clears chain code contour
@@ -73,26 +71,13 @@ protected:
 	//! Get contour moment (p,q up to MAX_CALCULATED_MOMENTS)
 	double GetMoment(int p, int q);
 
-	//! Crack code list
-	t_chainCodeList m_contour; 	
-
 private:
-	//! Starting point of the contour
-	CvPoint m_startPoint;
-	//! All points from the contour
-	t_PointList m_contourPoints;
+    std::vector<cv::Point2i> m_contour;
 
-
-
-	//! Computed area from contour
 	double m_area;
-	//! Computed perimeter from contour
-	double m_perimeter;
-	//! Computed moments from contour
-	CvMoments m_moments;
+    double m_perimeter;
 
-	//! Pointer to storage
-	CvMemStorage *m_parentStorage;
+    std::vector<cv::Moments> m_moments;
 };
 
 #endif	//!BLOBCONTOUR_H_INCLUDED

@@ -39,14 +39,13 @@ class CBlob
 
 public:
 	CBlob();
-	CBlob( t_labelType id, CvPoint startPoint, CvSize originalImageSize );
+    CBlob(t_labelType id, const std::vector<cv::Point2i> &contour, CvSize originalImageSize );
 	~CBlob();
 
 	//! Copy constructor
 	CBlob( const CBlob &src );
 	CBlob( const CBlob *src );
 
-	//! Operador d'assignació
 	//! Assigment operator
 	CBlob& operator=(const CBlob &src );
 	
@@ -70,61 +69,49 @@ public:
 	{
 		return m_id;
 	}
-	//! > 0 for extern blobs, 0 if not
-	int	  Exterior( IplImage *mask, bool xBorder = true, bool yBorder = true );
-	//! Compute blob's area
-	double Area();
-	//! Compute blob's perimeter
-	double Perimeter();
-	//! Compute blob's moment (p,q up to MAX_CALCULATED_MOMENTS)
-	double Moment(int p, int q);
 
-	//! Compute extern perimeter 
-	double ExternPerimeter( IplImage *mask, bool xBorder  = true, bool yBorder = true );
+    int	  Exterior( IplImage *mask, bool xBorder = true, bool yBorder = true );
+
+    double Area();
+
+    double Perimeter();
+
+    double Moment(int p, int q);
+
+    double ExternPerimeter( IplImage *mask, bool xBorder  = true, bool yBorder = true );
 	
-	//! Get mean grey color
-	double Mean( IplImage *image );
+    double Mean( IplImage *image );
 
-	//! Get standard deviation grey color
-	double StdDev( IplImage *image );
+    double StdDev( IplImage *image );
 
-	//! Indica si el blob està buit ( no té cap info associada )
-	//! Shows if the blob has associated information
-	bool IsEmpty();
+    bool IsEmpty();
 
-	//! Retorna el poligon convex del blob
-	//! Calculates the convex hull of the blob
-	t_PointList GetConvexHull();
+    std::vector<cv::Point2i> GetConvexHull();
 
-	//! Pinta l'interior d'un blob d'un color determinat
-	//! Paints the blob in an image
-	void FillBlob( IplImage *imatge, CvScalar color, int offsetX = 0, int offsetY = 0 );
+    void FillBlob( IplImage *imatge, CvScalar color, int offsetX = 0, int offsetY = 0 );
 
-	//! Join a blob to current one (add's contour
-	void JoinBlob( CBlob *blob );
+    void JoinBlob( CBlob *blob );
 
-	//! Get bounding box
-	CvRect GetBoundingBox();
-	//! Get bounding ellipse
-	CvBox2D GetEllipse();
+    CvRect GetBoundingBox() const;
 
-	//! Minimun X	
-	double MinX()
+    CvBox2D GetEllipse();
+
+    double MinX() const
 	{
 		return GetBoundingBox().x;
 	}
-	//! Minimun Y
-	double MinY()
+
+    double MinY() const
 	{
 		return GetBoundingBox().y;
-	}
-	//! Maximun X
+    }
+
 	double MaxX()
 	{
 		return GetBoundingBox().x + GetBoundingBox().width;
 	}
-	//! Maximun Y
-	double MaxY()
+
+    double MaxY()
 	{
 		return GetBoundingBox().y + GetBoundingBox().height;
 	}

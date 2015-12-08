@@ -27,7 +27,7 @@ CBlob::CBlob()
 	m_storage = NULL;
 	m_id = -1;
 }
-CBlob::CBlob( t_labelType id, CvPoint startPoint, CvSize originalImageSize )
+CBlob::CBlob( t_labelType id, std::vector<cv::Point2i> const & contour, CvSize originalImageSize )
 {
 	m_id = id;
 	m_area = m_perimeter = -1;
@@ -35,7 +35,7 @@ CBlob::CBlob( t_labelType id, CvPoint startPoint, CvSize originalImageSize )
 	m_boundingBox.width = -1;
 	m_ellipse.size.width = -1;
 	m_storage = cvCreateMemStorage();
-	m_externalContour = CBlobContour(startPoint, m_storage);
+    m_externalContour = CBlobContour(contour);
 	m_originalImageSize = originalImageSize;
 }
 //! Copy constructor
@@ -76,9 +76,12 @@ CBlob& CBlob::operator=(const CBlob &src )
 
 		m_storage = cvCreateMemStorage();
 
-		m_externalContour = CBlobContour(src.m_externalContour.GetStartPoint(), m_storage );
-		if( src.m_externalContour.m_contour )
-			m_externalContour.m_contour = cvCloneSeq( src.m_externalContour.m_contour, m_storage);
+        m_externalContour = CBlobContour(src.m_externalContour );
+
+        if( !src.m_externalContour.m_contour.empty() )
+        {
+            m_externalContour.m_contour = src.m_externalContour.m_contour;
+        }
 		m_internalContours.clear();
 
 		// copy all internal contours
@@ -93,9 +96,9 @@ CBlob& CBlob::operator=(const CBlob &src )
 
 			while (itSrc != src.m_internalContours.end())
 			{
-				*it = CBlobContour((*itSrc).GetStartPoint(), m_storage);
-				if( (*itSrc).m_contour )
-					(*it).m_contour = cvCloneSeq( (*itSrc).m_contour, m_storage);
+                *it = CBlobContour((*itSrc).GetContourPoints());
+                if( !(*itSrc).m_contour.empty() )
+                    (*it).m_contour = (*itSrc).m_contour;
 
 				it++;
 				itSrc++;
@@ -137,7 +140,7 @@ void CBlob::AddInternalContour( const CBlobContour &newContour )
 
 bool CBlob::IsEmpty()
 {
-	return GetExternalContour()->m_contour == NULL;
+    return GetExternalContour()->m_contour.empty();
 }
 
 double CBlob::Area()
@@ -187,132 +190,31 @@ int	CBlob::Exterior(IplImage *mask, bool xBorder /* = true */, bool yBorder /* =
 
 double CBlob::ExternPerimeter( IplImage *maskImage, bool xBorder /* = true */, bool yBorder /* = true */)
 {
-	t_PointList externContour, externalPoints;
-	CvSeqReader reader;
-	CvSeqWriter writer;
-	CvPoint actualPoint, previousPoint;
+    std::vector<cv::Point2i> externalPoints;
+    cv::Point2i actualPoint, previousPoint;
+
 	bool find = false;
 	int i,j;
 	int delta = 0;
 	
 	// it is calculated?
-	if( m_externPerimeter != -1 )
+    if( m_externPerimeter != -1 || m_externalContour.GetContourPoints().empty())
 	{
 		return m_externPerimeter;
 	}
 
 	// get contour pixels
-	externContour = m_externalContour.GetContourPoints();
+    std::vector<cv::Point2i> hull;
+    cv::convexHull( m_externalContour.GetContourPoints(), hull);
 
-	m_externPerimeter = 0;
+    // Compute the perimeter
+    m_externPerimeter = 0.;
+    for(int i=0; i<hull.size()-1; ++i)
+    {
+        m_externPerimeter += cv::norm(hull[i] - hull[i+1]);
+    }
 
-	// there are contour pixels?
-	if( externContour == NULL )
-	{
-		return m_externPerimeter;
-	}
-
-	cvStartReadSeq( externContour, &reader);
-
-	// create a sequence with the external points of the blob
-	externalPoints = cvCreateSeq( externContour->flags, externContour->header_size, externContour->elem_size, 
-								  m_storage );
-	cvStartAppendToSeq( externalPoints, &writer );
-	previousPoint.x = -1;
-
-	// which contour pixels touch border?
-	for( j=0; j< externContour->total; j++)
-	{
-		CV_READ_SEQ_ELEM( actualPoint, reader);
-
-		find = false;
-
-		// pixel is touching border?
-		if ( xBorder & ((actualPoint.x == 0) || (actualPoint.x == m_originalImageSize.width - 1 )) ||
-			 yBorder & ((actualPoint.y == 0) || (actualPoint.y == m_originalImageSize.height - 1 )))
-		{
-			find = true;
-		}
-		else
-		{
-			if( maskImage != NULL )
-			{
-				// verify if some of 8-connected neighbours is black in mask
-				char *pMask;
-				
-				pMask = (maskImage->imageData + actualPoint.x - 1 + (actualPoint.y - 1) * maskImage->widthStep);
-				
-				for ( i = 0; i < 3; i++, pMask++ )
-				{
-					if(*pMask == 0 && !find ) 
-					{
-						find = true;
-						break;
-					}						
-				}
-				
-				if(!find)
-				{
-					pMask = (maskImage->imageData + actualPoint.x - 1 + (actualPoint.y ) * maskImage->widthStep);
-				
-					for ( i = 0; i < 3; i++, pMask++ )
-					{
-						if(*pMask == 0 && !find ) 
-						{
-							find = true;
-							break;
-						}
-					}
-				}
-			
-				if(!find)
-				{
-					pMask = (maskImage->imageData + actualPoint.x - 1 + (actualPoint.y + 1) * maskImage->widthStep);
-
-					for ( i = 0; i < 3; i++, pMask++ )
-					{
-						if(*pMask == 0 && !find ) 
-						{
-							find = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		if( find )
-		{
-			if( previousPoint.x > 0 )
-				delta = abs(previousPoint.x - actualPoint.x) + abs(previousPoint.y - actualPoint.y);
-
-			// calculate separately each external contour segment 
-			if( delta > 2 )
-			{
-				cvEndWriteSeq( &writer );
-                m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
-				
-				cvClearSeq( externalPoints );
-				cvStartAppendToSeq( externalPoints, &writer );
-				delta = 0;
-				previousPoint.x = -1;
-			}
-
-			CV_WRITE_SEQ_ELEM( actualPoint, writer );
-			previousPoint = actualPoint;
-		}
-		
-	}
-
-	cvEndWriteSeq( &writer );
-
-    m_externPerimeter += cvArcLength( externalPoints, CV_WHOLE_SEQ, 0 );
-
-	cvClearSeq( externalPoints );
-
-	// divide by two because external points have one side inside the blob and the other outside
-	// Perimeter of external points counts both sides, so it must be divided
-	m_externPerimeter /= 2.0;
+    m_externPerimeter += cv::norm(hull.front() - hull.back());
 	
 	return m_externPerimeter;
 }
@@ -337,16 +239,8 @@ double CBlob::Moment(int p, int q)
 
 double CBlob::Mean( IplImage *image )
 {
-	// it is calculated?
-/*	if( m_meanGray != -1 )
-	{
-		return m_meanGray;
-	}
-*/	
 	// Create a mask with same size as blob bounding box
-	IplImage *mask;
-	CvScalar mean, std;
-	CvPoint offset;
+    cv::Point2i offset;
 
 	GetBoundingBox();
 	
@@ -357,102 +251,53 @@ double CBlob::Mean( IplImage *image )
 	}
 
 	// apply ROI and mask to input image to compute mean gray and standard deviation
-	mask = cvCreateImage( cvSize(m_boundingBox.width, m_boundingBox.height), IPL_DEPTH_8U, 1);
-	cvSetZero(mask);
+    cv::Mat mask( cv::Size(m_boundingBox.width, m_boundingBox.height), CV_8UC1, 1);
+    mask = cv::Scalar(0);
 
 	offset.x = -m_boundingBox.x;
 	offset.y = -m_boundingBox.y;
 
 	// draw contours on mask
-	cvDrawContours( mask, m_externalContour.GetContourPoints(), CV_RGB(255,255,255), CV_RGB(255,255,255),0, CV_FILLED, 8,
-					offset );
+    cv::drawContours( mask, m_externalContour.GetContourPoints(), -1, CV_RGB(255,255,255), -1, 8, cv::noArray(),
+                      INT_MAX, offset);
 
 	// draw internal contours
 	t_contourList::iterator it = m_internalContours.begin();
 	while(it != m_internalContours.end() )
 	{
-		cvDrawContours( mask, (*it).GetContourPoints(), CV_RGB(0,0,0), CV_RGB(0,0,0),0, CV_FILLED, 8,
-					offset );
+        cv::drawContours( mask, (*it).GetContourPoints(), -1, CV_RGB(0, 0, 0), -1, 8, cv::noArray(),
+                          INT_MAX, offset);
 		it++;
 	}
 
+    cv::Scalar mean, std;
 	cvSetImageROI( image, m_boundingBox );
-	cvAvgSdv( image, &mean, &std, mask );
+    cv::meanStdDev( cv::Mat(image), mean, std, mask );
 	
 	m_meanGray = mean.val[0];
 	m_stdDevGray = std.val[0];
 
-	cvReleaseImage( &mask );
 	cvResetImageROI( image );
-
 	return m_meanGray;
 }
 
 double CBlob::StdDev( IplImage *image )
 {
-	// it is calculated?
-/*	if( m_stdDevGray != -1 )
-	{
-		return m_stdDevGray;
-	}
-*/
 	// call mean calculation (where also standard deviation is calculated)
 	Mean( image );
 
 	return m_stdDevGray;
 }
 
-CvRect CBlob::GetBoundingBox()
+CvRect CBlob::GetBoundingBox() const
 {
 	// it is calculated?
 	if( m_boundingBox.width != -1 )
 	{
 		return m_boundingBox;
 	}
-
-	t_PointList externContour;
-	CvSeqReader reader;
-	CvPoint actualPoint;
 	
-	// get contour pixels
-	externContour = m_externalContour.GetContourPoints();
-	
-	// it is an empty blob?
-	if( !externContour )
-	{
-		m_boundingBox.x = 0;
-		m_boundingBox.y = 0;
-		m_boundingBox.width = 0;
-		m_boundingBox.height = 0;
-
-		return m_boundingBox;
-	}
-
-	cvStartReadSeq( externContour, &reader);
-
-	m_boundingBox.x = m_originalImageSize.width;
-	m_boundingBox.y = m_originalImageSize.height;
-	m_boundingBox.width = 0;
-	m_boundingBox.height = 0;
-
-	for( int i=0; i< externContour->total; i++)
-	{
-		CV_READ_SEQ_ELEM( actualPoint, reader);
-
-		m_boundingBox.x = MIN( actualPoint.x, m_boundingBox.x );
-		m_boundingBox.y = MIN( actualPoint.y, m_boundingBox.y );
-		
-		m_boundingBox.width = MAX( actualPoint.x, m_boundingBox.width );
-		m_boundingBox.height = MAX( actualPoint.y, m_boundingBox.height );
-	}
-
-	//m_boundingBox.x = max( m_boundingBox.x , 0 );
-	//m_boundingBox.y = max( m_boundingBox.y , 0 );
-
-	m_boundingBox.width -= m_boundingBox.x;
-	m_boundingBox.height -= m_boundingBox.y;
-	
-	return m_boundingBox;
+    return cv::boundingRect( m_externalContour.GetContourPoints() );
 }
 
 CvBox2D CBlob::GetEllipse()
@@ -535,38 +380,21 @@ CvBox2D CBlob::GetEllipse()
 
 }
 
-void CBlob::FillBlob( IplImage *imatge, CvScalar color, int offsetX /*=0*/, int offsetY /*=0*/) 					  
+void CBlob::FillBlob( IplImage *image, CvScalar color, int offsetX /*=0*/, int offsetY /*=0*/)
 {
-	cvDrawContours( imatge, m_externalContour.GetContourPoints(), color, color,0, CV_FILLED, 8 );
+    cv::drawContours( cv::Mat(image), m_externalContour.GetContourPoints(), -1, color, -1 );
 }
 
 
-
-t_PointList CBlob::GetConvexHull()
+std::vector<cv::Point2i> CBlob::GetConvexHull()
 {
-	CvSeq *convexHull = NULL;
-
-	if( m_externalContour.GetContourPoints() )
-		convexHull = cvConvexHull2( m_externalContour.GetContourPoints(), m_storage,
-					   CV_COUNTER_CLOCKWISE, 1 );
-
-	return convexHull;
+    std::vector<cv::Point2i> hull;
+    cv::convexHull( m_externalContour.GetContourPoints(), hull);
+    return hull;
 }
 
 void CBlob::JoinBlob( CBlob *blob )
 {
-	CvSeqWriter writer;
-	CvSeqReader reader;
-	t_chainCode chainCode;
-
-	cvStartAppendToSeq( m_externalContour.GetChainCode(), &writer );
-	cvStartReadSeq( blob->GetExternalContour()->GetChainCode(), &reader );
-
-	for (int i = 0; i < blob->GetExternalContour()->GetChainCode()->total; i++ )
-	{
-		CV_READ_SEQ_ELEM( chainCode, reader );
-		CV_WRITE_SEQ_ELEM( chainCode, writer );
-	}	
-	cvEndWriteSeq( &writer );
-
+    // Simply append the contour points
+    m_externalContour.addContourPoints( blob->GetExternalContour()->GetContourPoints() );
 }
