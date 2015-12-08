@@ -94,16 +94,16 @@ void Clustering::calcDistances(float * distances) {
 
 void Clustering::clusterConfidentIndices() {
 	int numConfidentIndices = detectionResult->confidentIndices.size();
-	float * distances = new float[numConfidentIndices*(numConfidentIndices-1)/2];
-	calcDistances(distances);
-	int * clusterIndices = new int[numConfidentIndices];
-	cluster(distances, clusterIndices);
+	std::vector<float> distances;
+	distances.resize(numConfidentIndices*(numConfidentIndices-1)/2);
+	calcDistances(distances.data());
+	std::vector<int> clusterIndices;
+	clusterIndices.resize(numConfidentIndices);
+	cluster(distances.data(), clusterIndices.data());
 	if(detectionResult->numClusters == 1) {
 		calcMeanRect(&detectionResult->confidentIndices);
 		//TODO: Take the maximum confidence as the result confidence.
 	}
-
-
 }
 
 void Clustering::cluster(float * distances, int * clusterIndices) {
@@ -118,10 +118,8 @@ void Clustering::cluster(float * distances, int * clusterIndices) {
 	int numDistances = numConfidentIndices*(numConfidentIndices-1)/2;
 
 	//Now: Cluster distances
-	int * distUsed = new int[numDistances];
-	for(int i = 0; i < numDistances; i++) {
-		distUsed[i] = 0;
-	}
+	std::vector<int> distUsed;
+	distUsed.resize(numDistances,0);
 
 	for(int i = 0; i < numConfidentIndices; i++) {
 		clusterIndices[i] = -1;
