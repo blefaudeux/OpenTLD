@@ -258,10 +258,10 @@ void DetectorCascade::detect(Mat img) {
 		if(foregroundDetector->isActive()) {
 			bool isInside = false;
 
-			for(size_t j = 0; j < detectionResult->fgList->size(); j++) {
+			for(size_t j = 0; j < detectionResult->fgList.size(); j++) {
 
 				int bgBox[4];
-				tldRectToArray(detectionResult->fgList->at(j), bgBox);
+				tldRectToArray(detectionResult->fgList.at(j), bgBox);
 				if(tldIsInside(window,bgBox)) { //TODO: This is inefficient and should be replaced by a quadtree
 					isInside = true;
 				}

@@ -30,7 +30,6 @@ namespace tld {
 
 DetectionResult::DetectionResult() {
 	containsValidData = false;
-	fgList = new vector<Rect>();
 	numClusters = 0;
 	detectorBB = NULL;
 	variances = NULL;
@@ -50,7 +49,7 @@ void DetectionResult::init(int numWindows, int numTrees) {
 
 void DetectionResult::reset() {
 	containsValidData = false;
-	if(fgList != NULL) fgList->clear();
+	fgList.clear();
 	confidentIndices.clear();
 	numClusters = 0;
 	if(detectorBB) 
@@ -59,7 +58,7 @@ void DetectionResult::reset() {
 }
 
 void DetectionResult::release() {
-	fgList->clear();
+	fgList.clear();
 	confidentIndices.clear();
 	if(variances) 
 		delete[] variances;

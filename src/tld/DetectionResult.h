@@ -37,7 +37,7 @@ namespace tld {
 class DetectionResult {
 public:
 	bool containsValidData;
-	vector<Rect>* fgList;
+	vector<Rect> fgList;
 	float * posteriors; /* Contains the posteriors for each slding window. Is of size numWindows. Allocated by tldInitClassifier. */
 	vector<int> confidentIndices;
 	int * featureVectors;
