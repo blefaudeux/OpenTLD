@@ -111,7 +111,7 @@ double CBlobContour::GetMoment(int p, int q)
     return 0. /* m_moments */;
 }
 
-void CBlobContour::addContourPoints(std::vector<cv::Point2i> const & newPoints)
+void CBlobContour::AddContourPoints(std::vector<cv::Point2i> const & newPoints)
 {
     m_contour.insert(m_contour.end(), newPoints.begin(), newPoints.end());
 }

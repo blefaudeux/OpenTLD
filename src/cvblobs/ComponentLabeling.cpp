@@ -8,17 +8,17 @@ static const CvPoint freemanCodeIncrement[8] =
 
 
 /**
-- FUNCIÓ: 
+- FUNCIÃ“: 
 - FUNCIONALITAT: 
-- PARÀMETRES:
+- PARÃ€METRES:
 	- 
 - RESULTAT:
 	- 
 - RESTRICCIONS:
 	- 
 - AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/29
-- MODIFICACIÓ: Data. Autor. Descripció.
+- DATA DE CREACIÃ“: 2008/04/29
+- MODIFICACIÃ“: Data. Autor. DescripciÃ³.
 */
 inline unsigned char GET_ABOVE_IMAGEPIXEL( unsigned char *currentPixel, IplImage *image )
 {
@@ -49,17 +49,17 @@ inline bool GET_BELOW_VISITEDPIXEL( bool *currentPixel, int imageWidth )
 }
 
 /**
-- FUNCIÓ: ASSIGN_LABEL
+- FUNCIÃ“: ASSIGN_LABEL
 - FUNCIONALITAT: Assigns label value to label image
-- PARÀMETRES:
+- PARÃ€METRES:
 	- 
 - RESULTAT:
 	- 
 - RESTRICCIONS:
 	- 
 - AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/29
-- MODIFICACIÓ: Data. Autor. Descripció.
+- DATA DE CREACIÃ“: 2008/04/29
+- MODIFICACIÃ“: Data. Autor. DescripciÃ³.
 */
 inline void ASSIGN_LABEL( CvPoint p, t_labelType *labels, int imageWidth, int newLabel )
 {
@@ -73,9 +73,9 @@ inline void ASSIGN_VISITED( CvPoint p, bool *visitedPoints, int imageWidth  )
 }
 
 /**
-- FUNCIÓ: ComponentLabeling
+- FUNCIÃ“: ComponentLabeling
 - FUNCIONALITAT: Calcula els components binaris (blobs) d'una imatge amb connectivitat a 8
-- PARÀMETRES:
+- PARÃ€METRES:
 	- inputImage: image to segment (pixel values different than blobColor are treated as background)
 	- maskImage: if not NULL, all the pixels equal to 0 in mask are skipped in input image
 	- backgroundColor: color of background (ignored pixels)
@@ -85,8 +85,8 @@ inline void ASSIGN_VISITED( CvPoint p, bool *visitedPoints, int imageWidth  )
 - RESTRICCIONS:
 	- 
 - AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/21
-- MODIFICACIÓ: Data. Autor. Descripció.
+- DATA DE CREACIÃ“: 2008/04/21
+- MODIFICACIÃ“: Data. Autor. DescripciÃ³.
 - NOTA: Algorithm based on "A linear-time component labeling algorithm using contour tracing technique", 
 		F.Chang et al
 */
@@ -202,7 +202,9 @@ bool ComponentLabeling(	IplImage* inputImage,
 				*pLabels = currentLabel;
 				
 				// create new blob
-				currentBlob = new CBlob(currentLabel, currentPoint, imageSizes );
+                std::vector<cv::Point2i> contour;
+                contour.push_back(currentPoint);
+                currentBlob = new CBlob(currentLabel, contour, imageSizes );
 
 				// contour tracing with currentLabel
 				contourTracing( inputImage, maskImage, currentPoint, 
@@ -234,7 +236,7 @@ bool ComponentLabeling(	IplImage* inputImage,
 					if(contourLabel>0)
 					{
 						currentBlob = blobs[contourLabel-1];
-						CBlobContour newContour(currentPoint, currentBlob->GetStorage());
+                        CBlobContour newContour( currentBlob->GetExternalContour() );
 						
 
 						// contour tracing with contourLabel
@@ -271,17 +273,17 @@ bool ComponentLabeling(	IplImage* inputImage,
 
 
 /**
-- FUNCIÓ: 
-- FUNCIONALITAT: 
-- PARÀMETRES:
-	- 
+- FUNCIÃ“:
+- FUNCIONALITAT:
+- PARÃ€METRES:
+    -
 - RESULTAT:
-	- 
+    -
 - RESTRICCIONS:
-	- 
+    -
 - AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/29
-- MODIFICACIÓ: Data. Autor. Descripció.
+- DATA DE CREACIÃ“: 2008/04/29
+- MODIFICACIÃ“: Data. Autor. DescripciÃ³.
 */
 void contourTracing( IplImage *image, 
 					 IplImage *maskImage,
@@ -314,8 +316,9 @@ void contourTracing( IplImage *image,
 		return;
 	}
 
-	// add chain code to current contour
-	currentBlobcontour->AddChainCode(movement);
+    std::vector<cv::Point2i> chain;
+    chain.push_back(contourStart);
+    chain.push_back(tsecond);
 	
 	// assign label to next point 
 	ASSIGN_LABEL( tsecond, labels, image->width, label );
@@ -327,7 +330,8 @@ void contourTracing( IplImage *image,
 	
 	// while T is different than contourStart and Tnext is different than T
 	// follow contour until start point is reached again
-	while ( t.x != contourStart.x || t.y != contourStart.y || 
+    chain.clear();
+    while ( t.x != contourStart.x || t.y != contourStart.y ||
 			tsecond.x != tnext.x || tsecond.y != tnext.y )
 	{
 		
@@ -343,23 +347,26 @@ void contourTracing( IplImage *image,
 		ASSIGN_LABEL( tnext, labels, image->width, label );
 
 		// add chain code to current contour
-		currentBlobcontour->AddChainCode(movement);
+        chain.push_back(t);
+        chain.push_back(tnext);
+        currentBlobcontour->AddContourPoints(chain);
+        chain.clear();
 	}
 
 }
 
 /**
-- FUNCIÓ: tracer
+- FUNCIÃ“: tracer
 - FUNCIONALITAT: Searches for next point of a contour
-- PARÀMETRES:
+- PARÃ€METRES:
 	- 
 - RESULTAT:
 	- 
 - RESTRICCIONS:
 	- 
 - AUTOR: rborras
-- DATA DE CREACIÓ: 2008/04/30
-- MODIFICACIÓ: Data. Autor. Descripció.
+- DATA DE CREACIÃ“: 2008/04/30
+- MODIFICACIÃ“: Data. Autor. DescripciÃ³.
 */
 CvPoint tracer( IplImage *image, IplImage *maskImage, CvPoint P, bool *visitedPoints,
 				short initialMovement,

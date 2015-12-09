@@ -1,9 +1,9 @@
 /************************************************************************
   			Blob.h
   			
-FUNCIONALITAT: Definició de la classe CBlob
+FUNCIONALITAT: DefiniciÃ³ de la classe CBlob
 AUTOR: Inspecta S.L.
-MODIFICACIONS (Modificació, Autor, Data):
+MODIFICACIONS (ModificaciÃ³, Autor, Data):
 
 FUNCTIONALITY: Definition of the CBlob class and some helper classes to perform
 			   some calculations on it
@@ -20,13 +20,6 @@ MODIFICATIONS (Modification, Author, Date):
 
 #include "BlobLibraryConfiguration.h"
 #include "BlobContour.h"
-
-
-#ifdef BLOB_OBJECT_FACTORY
-	//! Object factory pattern implementation
-	#include "..\inspecta\DesignPatterns\ObjectFactory.h"
-#endif
-
 
 //! Type of labelled images
 typedef unsigned int t_labelType;

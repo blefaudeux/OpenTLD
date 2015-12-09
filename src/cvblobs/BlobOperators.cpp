@@ -17,105 +17,6 @@ double CBlobGetHullArea::operator()(CBlob &blob)
     return blob.Area();
 }
 
-double CBlobGetMinXatMinY::operator()(CBlob &blob)
-{
-    std::vector<cv::Point2i> const & contour = blob.GetExternalContour()->GetContourPoints();
-
-    if (contour.empty())
-    {
-        return LONG_MAX;
-    }
-
-    cv::Point2i minPoint = contour[0];
-
-    for(unsigned int i=0; i<contour.size(); ++i)
-    {
-        if (contour[i].y < minPoint.y)
-        {
-            minPoint = contour[i];
-        }
-    }
-
-    return minPoint.x;
-}
-
-
-double CBlobGetMinYatMaxX::operator()(CBlob &blob)
-{
-    std::vector<cv::Point2i> const & contour = blob.GetExternalContour()->GetContourPoints();
-
-    if (contour.empty())
-    {
-        return LONG_MAX;
-    }
-
-    cv::Point2i maxPoint = contour[0];
-
-    for(unsigned int i=0; i<contour.size(); ++i)
-    {
-        if (contour[i].x < maxPoint.x)
-        {
-            maxPoint = contour[i];
-        }
-    }
-
-    return maxPoint.y;
-}
-
-
-double CBlobGetMaxXatMaxY::operator()(CBlob &blob)
-{
-	double result = LONG_MIN;
-	
-	CvSeqReader reader;
-	CvPoint actualPoint;
-	t_PointList externContour;
-	
-	externContour = blob.GetExternalContour()->GetContourPoints();
-	if( !externContour ) return result;
-
-	cvStartReadSeq( externContour, &reader);
-
-	for( int i=0; i< externContour->total; i++)
-	{
-		CV_READ_SEQ_ELEM( actualPoint, reader);
-
-		if( (actualPoint.y == blob.MaxY()) && (actualPoint.x > result) )
-		{
-			result = actualPoint.x;
-		}	
-	}
-
-	return result;
-}
-
-double CBlobGetMaxYatMinX::operator()(CBlob &blob)
-{
-	double result = LONG_MIN;
-	
-	CvSeqReader reader;
-	CvPoint actualPoint;
-	t_PointList externContour;
-	
-	externContour = blob.GetExternalContour()->GetContourPoints();
-	if( !externContour ) return result;
-
-	cvStartReadSeq( externContour, &reader);
-
-	
-	for( int i=0; i< externContour->total; i++)
-	{
-		CV_READ_SEQ_ELEM( actualPoint, reader);
-
-		if( (actualPoint.x == blob.MinX()) && (actualPoint.y > result) )
-		{
-			result = actualPoint.y;
-		}	
-	}
-
-	return result;
-}
-
 double CBlobGetElongation::operator()(CBlob &blob)
 {
 	double ampladaC,longitudC,amplada,longitud;
@@ -213,9 +114,9 @@ double CBlobGetDistanceFromPoint::operator()(CBlob &blob)
 
 double CBlobGetXYInside::operator()(CBlob &blob)
 {
-	if( blob.GetExternalContour()->GetContourPoints() )
+    if( !blob.GetExternalContour()->GetContourPoints().empty() )
 	{
-		return cvPointPolygonTest( blob.GetExternalContour()->GetContourPoints(), m_p,0) >= 0;
+        return cv::pointPolygonTest(blob.GetExternalContour()->GetContourPoints(), m_p, false) >=0;
 	}
 
 	return 0;

@@ -284,46 +284,6 @@ public:
 	}
 };
 
-class CBlobGetMinXatMinY: public COperadorBlob
-{
-public:
-    double operator()(CBlob &blob);
-	const char *GetNom()
-	{
-		return "CBlobGetMinXatMinY";
-	}
-};
-
-class CBlobGetMinYatMaxX: public COperadorBlob
-{
-public:
-    double operator()(CBlob &blob);
-	const char *GetNom()
-	{
-		return "CBlobGetMinYatMaxX";
-	}
-};
-
-class CBlobGetMaxXatMaxY: public COperadorBlob
-{
-public:
-    double operator()(CBlob &blob);
-	const char *GetNom()
-	{
-		return "CBlobGetMaxXatMaxY";
-	}
-};
-
-class CBlobGetMaxYatMinX: public COperadorBlob
-{
-public:
-    double operator()(CBlob &blob);
-	const char *GetNom()
-	{
-		return "CBlobGetMaxYatMinX";
-	}
-};
-
 class CBlobGetMinX: public COperadorBlob
 {
 public:

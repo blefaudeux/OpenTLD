@@ -36,7 +36,7 @@ public:
 
     CBlobContour& operator=( const CBlobContour &source );
 
-    void addContourPoints(std::vector<cv::Point2i> const & newPoints);
+    void AddContourPoints(std::vector<cv::Point2i> const & newPoints);
 
 	//! Return freeman chain coded contour
     std::vector<cv::Point2i> const & GetChainCode()

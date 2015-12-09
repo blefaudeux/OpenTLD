@@ -1,9 +1,9 @@
 /************************************************************************
   			Blob.cpp
   			
-- FUNCIONALITAT: Implementació de la classe CBlob
+- FUNCIONALITAT: ImplementaciÃ³ de la classe CBlob
 - AUTOR: Inspecta S.L.
-MODIFICACIONS (Modificació, Autor, Data):
+MODIFICACIONS (ModificaciÃ³, Autor, Data):
 
  
 FUNCTIONALITY: Implementation of the CBlob class and some helper classes to perform
@@ -396,5 +396,5 @@ std::vector<cv::Point2i> CBlob::GetConvexHull()
 void CBlob::JoinBlob( CBlob *blob )
 {
     // Simply append the contour points
-    m_externalContour.addContourPoints( blob->GetExternalContour()->GetContourPoints() );
+    m_externalContour.AddContourPoints( blob->GetExternalContour()->GetContourPoints() );
 }
