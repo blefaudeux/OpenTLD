@@ -24,27 +24,6 @@ public:
 
 typedef COperadorBlob funcio_calculBlob;
 
-#ifdef BLOB_OBJECT_FACTORY
-	/**
-		Funció per comparar dos identificadors dins de la fàbrica de COperadorBlobs
-	*/
-	struct functorComparacioIdOperador
-	{
-	  bool operator()(const char* s1, const char* s2) const
-	  {
-		return strcmp(s1, s2) < 0;
-	  }
-	};
-
-	//! Definition of Object factory type for COperadorBlob objects
-	typedef ObjectFactory<COperadorBlob, const char *, functorComparacioIdOperador > t_OperadorBlobFactory;
-
-	//! Funció global per a registrar tots els operadors definits a blob.h
-	void RegistraTotsOperadors( t_OperadorBlobFactory &fabricaOperadorsBlob );
-
-#endif
-
-
 //! Classe per calcular l'etiqueta d'un blob
 //! Class to get ID of a blob
 class CBlobGetID : public COperadorBlob

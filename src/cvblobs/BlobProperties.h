@@ -9,12 +9,6 @@
 #include "BlobContour.h"
 
 
-#ifdef BLOB_OBJECT_FACTORY
-	//! Object factory pattern implementation
-	#include "..\inspecta\DesignPatterns\ObjectFactory.h"
-#endif
-
-
 //! Type of labelled images
 typedef unsigned int t_labelType;
 
