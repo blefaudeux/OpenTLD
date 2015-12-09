@@ -72,7 +72,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgomp")
 
-include_directories(src/cvblobs src/imacq src/config src/tld src/mftracker src/main)
+include_directories(src/cvblobs src/imacq src/config src/tld src/mftracker src/main ${OpenCV_INCLUDE_DIRS})
 
 #-------------------------------------------------------------------------------
 #add subdirectories
