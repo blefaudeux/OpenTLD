@@ -18,9 +18,6 @@
 */
 #include <stdio.h>
 
-#include <opencv/cv.hpp>
-#include <opencv/cxcore.hpp>
-
 #include "imAcq.h"
 
 ImAcq * imAcqAlloc() {
