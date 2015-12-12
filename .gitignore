@@ -1,6 +1,7 @@
 .cproject
 .project
 CMakeCache.txt
+build
 CMakeFiles
 Makefile
 OpenTLDConfig.cmake
