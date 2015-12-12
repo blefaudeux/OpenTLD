@@ -36,9 +36,8 @@
  void Main::doWork() {
 
 	IplImage * img = imAcqGetImg(imAcq);
-	IplImage * grey = cvCreateImage( cvGetSize(img), 8, 1 );
+    IplImage * grey = cvCreateImage( cvGetSize(img), 8, 1 ); // FIXME: Memleak over there
 	cvCvtColor( img,grey, CV_BGR2GRAY );
-
 
 	tld->detectorCascade->imgWidth = grey->width;
 	tld->detectorCascade->imgHeight = grey->height;
@@ -97,6 +96,8 @@
 		reuseFrameOnce = true;
 	}
 
+    cvReleaseImage(&grey);
+
 	while(imAcqHasMoreFrames(imAcq)) {
 		double tic = cvGetTickCount();
 
@@ -107,7 +108,7 @@
 				printf("current image is NULL, assuming end of input.\n");
 				break;
 			}
-			grey = cvCreateImage( cvGetSize(img), 8, 1 );
+            grey = cvCreateImage( cvGetSize(img), 8, 1 );
 			cvCvtColor( img, grey, CV_BGR2GRAY );
 		}
 
