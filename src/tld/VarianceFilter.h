@@ -34,26 +34,26 @@ using namespace cv;
 
 namespace tld {
 
-class VarianceFilter {
-	IntegralImage<int>* integralImg;
-	IntegralImage<long long>* integralImg_squared;
+    class VarianceFilter {
+            IntegralImage<int>* integralImg;
+            IntegralImage<long long>* integralImg_squared;
 
-public:
-	bool enabled;
-	int * windowOffsets;
+        public:
+            bool enabled;
+            int * windowOffsets;
 
-	DetectionResult * detectionResult;
+            DetectionResult * detectionResult;
 
-	float minVar;
+            float minVar;
 
-	VarianceFilter();
-	virtual ~VarianceFilter();
+            VarianceFilter();
+            virtual ~VarianceFilter();
 
-	void release();
-	void nextIteration(Mat img);
-	bool filter(int idx);
-	float calcVariance(int *off);
-};
+            void release();
+            void nextIteration(Mat img);
+            bool filter(int idx);
+            float calcVariance(int *off);
+    };
 
 } /* namespace tld */
 #endif /* VARIANCEFILTER_H_ */

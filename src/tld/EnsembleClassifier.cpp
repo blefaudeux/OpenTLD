@@ -151,6 +151,10 @@ void EnsembleClassifier::calcFeatureVector(int windowIdx, int * featureVector) {
 
 float EnsembleClassifier::calcConfidence(int * featureVector) {
 	float conf = 0.0;
+    if (!posteriors)
+    {
+        return -1.f;
+    }
 
 	for(int i = 0; i < numTrees; i++) {
 		conf += posteriors[i * numIndices + featureVector[i]];
