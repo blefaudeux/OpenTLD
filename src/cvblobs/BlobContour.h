@@ -4,9 +4,8 @@
 
 #include "list"
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+#include <opencv/cv.h>
+#include <opencv/cxcore.h>
 
 //! Type of chain codes
 typedef unsigned char t_chainCode;
@@ -25,7 +24,7 @@ class CBlobContour
 {
 	friend class CBlob;
 	friend class CBlobProperties; //AO
-	
+
 public:
 	CBlobContour();
     CBlobContour(const std::vector<cv::Point2i> &contour);
@@ -52,7 +51,7 @@ public:
 	//! Return all contour points
     std::vector<cv::Point2i> const & GetContourPoints() const;
 
-protected:	
+protected:
 
 	CvPoint GetStartPoint() const
 	{
@@ -61,9 +60,9 @@ protected:
 
 	//! Clears chain code contour
 	void ResetChainCode();
-	
 
-	
+
+
 	//! Computes area from contour
 	double GetArea();
 	//! Computes perimeter from contour
@@ -81,5 +80,3 @@ private:
 };
 
 #endif	//!BLOBCONTOUR_H_INCLUDED
-
-

@@ -26,8 +26,7 @@
 #ifndef IMACQ_IMPL_H_
 #define IMACQ_IMPL_H_
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui/highgui.hpp>>
+#include <opencv/highgui.h>
 
 /**
  * Capturing method
