@@ -38,7 +38,8 @@ using namespace cv;
 namespace tld {
 
 class NNClassifier {
-	float ncc(float *f1,float *f2);
+    float ncc(float const *f1, float const *f2);
+
 public:
 	bool enabled;
 
@@ -46,17 +47,17 @@ public:
 	float thetaFP;
 	float thetaTP;
 	DetectionResult* detectionResult;
-	vector<NormalizedPatch>* falsePositives;
-	vector<NormalizedPatch>* truePositives;
+    vector<NormalizedPatch> falsePositives;
+    vector<NormalizedPatch> truePositives;
 
 	NNClassifier();
 	virtual ~NNClassifier();
 
 	void release();
-	float classifyPatch(NormalizedPatch * patch);
+    float classifyPatch(NormalizedPatch & patch);
 	float classifyBB(Mat img, Rect* bb);
 	float classifyWindow(Mat img, int windowIdx);
-	void learn(vector<NormalizedPatch> patches);
+	void learn(vector<NormalizedPatch> &patches);
 	bool filter(Mat img, int windowIdx);
 };
 

@@ -103,7 +103,7 @@ Rect* tldCopyRect(Rect* r);
 
 //TODO: Change function names
 float tldOverlapRectRect(Rect r1, Rect r2);
-void tldOverlapOne(int * windows, int numWindows, int index, vector<int> * indices, float * overlap);
+void tldOverlapOne(int * windows, int numWindows, int index, vector<int> &indices, vector<float> &overlap);
 void tldOverlap(int * windows, int numWindows, int * boundary, float * overlap);
 void tldOverlapRect(int * windows, int numWindows, Rect * boundary, float * overlap);
 

@@ -34,28 +34,33 @@
 using namespace std;
 using namespace cv;
 
-namespace tld {
+namespace tld
+{
 
-class Clustering {
-	void calcMeanRect(vector<int> * indices);
-	void calcDistances(float * distances);
-	void cluster(float * distances, int * clusterIndices);
-public:
-	int* windows;
-	int numWindows;
+    class Clustering
+    {
+            void calcMeanRect(vector<int> const &indices);
 
-	DetectionResult* detectionResult;
+            void calcDistances(vector<float> &distances);
 
-	//Configurable members
-	float cutoff;
+            void cluster(vector<float> const & distances, vector<int> & clusterIndices);
+
+        public:
+            int* windows;
+            int numWindows;
+
+            DetectionResult* detectionResult;
+
+            //Configurable members
+            float cutoff;
 
 
 
-	Clustering();
-	virtual ~Clustering();
-	void release();
-	void clusterConfidentIndices();
-};
+            Clustering();
+            virtual ~Clustering();
+            void release();
+            void clusterConfidentIndices();
+    };
 
 } /* namespace tld */
 #endif /* CLUSTERING_H_ */

@@ -32,25 +32,18 @@ namespace tld {
 NNClassifier::NNClassifier() {
 	thetaFP = .5;
 	thetaTP = .65;
-
-	truePositives = new vector<NormalizedPatch>();
-	falsePositives = new vector<NormalizedPatch>();
-
 }
 
 NNClassifier::~NNClassifier() {
-	release();
-
-	delete truePositives;
-	delete falsePositives;
+    release();
 }
 
 void NNClassifier::release() {
-	falsePositives->clear();
-	truePositives->clear();
+    falsePositives.clear();
+    truePositives.clear();
 }
 
-float NNClassifier::ncc(float *f1,float *f2) {
+float NNClassifier::ncc(float const * f1,float const * f2) {
 	double corr = 0;
 	double norm1 = 0;
 	double norm2 = 0;
@@ -67,46 +60,53 @@ float NNClassifier::ncc(float *f1,float *f2) {
 	return (corr / sqrt(norm1*norm2) + 1) / 2.0;
 }
 
-float NNClassifier::classifyPatch(NormalizedPatch * patch) {
+float NNClassifier::classifyPatch(NormalizedPatch & patch) {
 
-	if(truePositives->empty()) {
+    if(truePositives.empty()) {
 		return 0;
 	}
 
-	if(falsePositives->empty()) {
+    if(falsePositives.empty()) {
 		return 1;
 	}
 
 	float ccorr_max_p = 0;
+
 	//Compare patch to positive patches
-	for(size_t i = 0; i < truePositives->size(); i++) {
-		float ccorr = ncc(truePositives->at(i).values, patch->values);
-		if(ccorr > ccorr_max_p) {
-			ccorr_max_p = ccorr;
-		}
-	}
+    for (auto const & item : truePositives)
+    {
+        float const ccorr = ncc( item.values, patch.values );
+
+        if(ccorr > ccorr_max_p)
+        {
+            ccorr_max_p = ccorr;
+        }
+    }
 
 	float ccorr_max_n = 0;
+
 	//Compare patch to positive patches
-	for(size_t i = 0; i < falsePositives->size(); i++) {
-		float ccorr = ncc(falsePositives->at(i).values, patch->values);
-		if(ccorr > ccorr_max_n) {
+    for(auto const & item : falsePositives)
+    {
+        float const ccorr = ncc(item.values, patch.values);
+
+        if(ccorr > ccorr_max_n)
+        {
 			ccorr_max_n = ccorr;
 		}
 	}
 
-	float dN = 1-ccorr_max_n;
-	float dP = 1-ccorr_max_p;
+    float const dN = 1-ccorr_max_n;
+    float const dP = 1-ccorr_max_p;
 
-	float distance = dN/(dN+dP);
-	return distance;
+    return dN/(dN+dP);
 }
 
 float NNClassifier::classifyBB(Mat img, Rect* bb) {
 	NormalizedPatch patch;
 
 	tldExtractNormalizedPatchRect(img, bb, patch.values);
-	return classifyPatch(&patch);
+    return classifyPatch(patch);
 
 }
 
@@ -116,7 +116,7 @@ float NNClassifier::classifyWindow(Mat img, int windowIdx) {
 	int * bbox = &windows[TLD_WINDOW_SIZE*windowIdx];
 	tldExtractNormalizedPatchBB(img, bbox, patch.values);
 
-	return classifyPatch(&patch);
+    return classifyPatch(patch);
 }
 
 bool NNClassifier::filter(Mat img, int windowIdx) {
@@ -131,23 +131,21 @@ bool NNClassifier::filter(Mat img, int windowIdx) {
 	return true;
 }
 
-void NNClassifier::learn(vector<NormalizedPatch> patches) {
+void NNClassifier::learn(vector<NormalizedPatch> & patches) {
 	//TODO: Randomization might be a good idea here
-	for(size_t i = 0; i < patches.size(); i++) {
 
-		NormalizedPatch patch = patches[i];
-
-		float conf = classifyPatch(&patch);
+    for (auto & patch : patches)
+    {
+        float conf = classifyPatch(patch);
 
 		if(patch.positive && conf <= thetaTP) {
-			truePositives->push_back(patch);
+            truePositives.push_back(patch);
 		}
 
 		if(!patch.positive && conf >= thetaFP) {
-			falsePositives->push_back(patch);
+            falsePositives.push_back(patch);
 		}
 	}
-
 }
 
 

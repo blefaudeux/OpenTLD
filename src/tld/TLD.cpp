@@ -338,12 +338,11 @@ void TLD::writeToFile(const char * path) {
 	fprintf(file,"%d #width\n", detectorCascade->objWidth);
 	fprintf(file,"%d #height\n", detectorCascade->objHeight);
 	fprintf(file,"%f #min_var\n", detectorCascade->varianceFilter->minVar);
-	fprintf(file,"%d #Positive Sample Size\n", nn->truePositives->size());
+    fprintf(file,"%d #Positive Sample Size\n", nn->truePositives.size());
 
 
-
-	for(size_t s = 0; s < nn->truePositives->size();s++) {
-		float * imageData =nn->truePositives->at(s).values;
+    for(size_t s = 0; s < nn->truePositives.size();s++) {
+        float * imageData =nn->truePositives[s].values;
 		for(int i = 0; i < TLD_PATCH_SIZE; i++) {
 			for(int j = 0; j < TLD_PATCH_SIZE; j++) {
 				fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
@@ -352,10 +351,10 @@ void TLD::writeToFile(const char * path) {
 		}
 	}
 
-	fprintf(file,"%d #Negative Sample Size\n", nn->falsePositives->size());
+    fprintf(file,"%d #Negative Sample Size\n", nn->falsePositives.size());
 
-	for(size_t s = 0; s < nn->falsePositives->size();s++) {
-		float * imageData = nn->falsePositives->at(s).values;
+    for(size_t s = 0; s < nn->falsePositives.size();s++) {
+        float * imageData = nn->falsePositives[s].values;
 		for(int i = 0; i < TLD_PATCH_SIZE; i++) {
 			for(int j = 0; j < TLD_PATCH_SIZE; j++) {
 				fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
@@ -452,7 +451,7 @@ void TLD::readFromFile(const char * path) {
 			}
 		}
 
-		nn->truePositives->push_back(patch);
+        nn->truePositives.push_back(patch);
 	}
 
 	int numNegativePatches;
@@ -480,7 +479,7 @@ void TLD::readFromFile(const char * path) {
 			}
 		}
 
-		nn->falsePositives->push_back(patch);
+        nn->falsePositives.push_back(patch);
 	}
 
 	fscanf(file,"%d \n", &ec->numTrees);
