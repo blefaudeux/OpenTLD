@@ -94,7 +94,7 @@ void TLD::processImage(Mat img)
 	cvtColor( img,grey_frame, CV_RGB2GRAY );
 	currImg = grey_frame; // Store new image , right after storeCurrentData();
 
-    if(trackerEnabled)
+    if(trackerEnabled && prevBB)
     {
         medianFlowTracker->track(prevImg, currImg, *prevBB.get());
 	}
