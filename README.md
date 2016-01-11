@@ -93,3 +93,11 @@ Use CMake to build the project. You can use "cmake-gui", if you need a graphical
 	* cd ..
 	* make
 	* ./tld
+
+
+This Branch :
+=============
+* Uses C++11 / C++14 elements (needs a modern compiler)
+* Fixes some memory leak issues from the original TLD code
+* Should in the end move most computations to the 
+[Halide](http://halide-lang.org/) model
