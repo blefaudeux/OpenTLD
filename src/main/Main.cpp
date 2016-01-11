@@ -91,7 +91,7 @@
 
         printf("Starting at %d %d %d %d\n", bb.x, bb.y, bb.width, bb.height);
 
-        tld->selectObject(grey, &bb);
+        tld->selectObject(grey, bb);
         skipProcessingOnce = true;
         reuseFrameOnce = true;
     }
@@ -231,13 +231,12 @@
 
                 if(key == 'r') {
                     CvRect box;
+
                     if(getBBFromUser(img, box, gui) == PROGRAM_EXIT) {
                         break;
                     }
 
-                    Rect r = Rect(box);
-
-                    tld->selectObject(grey, &r);
+                    tld->selectObject(grey, box);
                 }
             }
 

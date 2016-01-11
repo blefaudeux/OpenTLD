@@ -102,7 +102,7 @@ float NNClassifier::classifyPatch(NormalizedPatch & patch) {
     return dN/(dN+dP);
 }
 
-float NNClassifier::classifyBB(Mat img, Rect* bb) {
+float NNClassifier::classifyBB(Mat img, Rect & bb) {
 	NormalizedPatch patch;
 
 	tldExtractNormalizedPatchRect(img, bb, patch.values);

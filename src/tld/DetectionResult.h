@@ -27,6 +27,7 @@
 #define DETECTIONRESULT_H_
 
 #include <vector>
+#include <memory>
 #include <opencv/cv.h>
 
 using namespace std;
@@ -47,12 +48,16 @@ namespace tld {
 
         public:
             vector<Rect> fgList;
-            float * posteriors; /* Contains the posteriors for each sliding window. Is of size numWindows. Allocated by tldInitClassifier. */
             vector<int> confidentIndices;
-            int * featureVectors;
-            float * variances;
+
             int numClusters;
-            Rect* detectorBB; //Contains a valid result only if numClusters = 1
+
+            /* Contains the posteriors for each sliding window. Is of size numWindows. */
+            vector<float> variances;
+            vector<float> posteriors;
+            vector<int>   featureVectors;
+
+            shared_ptr<Rect> detectorBB; //Contains a valid result only if numClusters = 1
 
             bool containsValidData;
     };

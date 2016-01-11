@@ -164,7 +164,7 @@ float EnsembleClassifier::calcConfidence(int * featureVector) {
 }
 
 void EnsembleClassifier::classifyWindow(int windowIdx) {
-	int* featureVector = detectionResult->featureVectors + numTrees * windowIdx;
+    int* featureVector = &detectionResult->featureVectors[numTrees * windowIdx];
 	calcFeatureVector(windowIdx, featureVector);
 
 	detectionResult->posteriors[windowIdx] = calcConfidence(featureVector);

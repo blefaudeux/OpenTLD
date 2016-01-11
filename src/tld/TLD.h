@@ -32,44 +32,49 @@
 #include "DetectorCascade.h"
 
 using namespace cv;
+using namespace std;
 
 namespace tld {
 
-class TLD {
-	void storeCurrentData();
-	void fuseHypotheses();
-	void learn();
-	void initialLearning();
-public:
-	bool trackerEnabled;
-	bool detectorEnabled;
-	bool learningEnabled;
-	bool alternating;
+    class TLD {
+            void storeCurrentData();
+            void fuseHypotheses();
+            void learn();
+            void initialLearning();
+        public:
+            bool trackerEnabled;
+            bool detectorEnabled;
+            bool learningEnabled;
+            bool alternating;
 
-	MedianFlowTracker* medianFlowTracker;
-	DetectorCascade* detectorCascade;
-    std::shared_ptr<NNClassifier> nnClassifier;
-	bool valid;
-	bool wasValid;
-	Mat prevImg;
-	Mat currImg;
-	Rect* prevBB;
-	Rect* currBB;
-	float currConf;
-	bool learning;
+            bool valid;
+            bool wasValid;
+            Mat prevImg;
+            Mat currImg;
 
-	TLD();
-	virtual ~TLD();
-	void release();
-	void selectObject(Mat img, Rect * bb);
-	void processImage(Mat img);
-	void writeToFile(const char * path);
-	void readFromFile(const char * path);
-	void drawDetection(IplImage * img) const;
+            shared_ptr<Rect> prevBB;
+            shared_ptr<Rect> currBB;
 
-private : IplImage * _img_posterios;
-public : Mat drawPosterios();
-};
+            shared_ptr<MedianFlowTracker> medianFlowTracker;
+            shared_ptr<DetectorCascade> detectorCascade;
+            shared_ptr<NNClassifier> nnClassifier;
+
+            float currConf;
+            bool learning;
+
+            TLD();
+            virtual ~TLD();
+            void release();
+            void selectObject(Mat img, Rect const & bb);
+            void processImage(Mat img);
+            void writeToFile(const char * path);
+            void readFromFile(const char * path);
+            void drawDetection(IplImage * img) const;
+            Mat  drawPosterios();
+
+        private :
+            IplImage * _img_posterios;
+    };
 
 } /* namespace tld */
 #endif /* TLD_H_ */

@@ -56,7 +56,7 @@ public:
 
 	void release();
     float classifyPatch(NormalizedPatch & patch);
-	float classifyBB(Mat img, Rect* bb);
+    float classifyBB(Mat img, Rect &bb);
 	float classifyWindow(Mat img, int windowIdx);
 	void learn(vector<NormalizedPatch> &patches);
 	bool filter(Mat img, int windowIdx);

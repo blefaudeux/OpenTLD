@@ -406,7 +406,7 @@ int Config::configure(Main* main) {
 		}
 	}
 
-	DetectorCascade* detectorCascade = main->tld->detectorCascade;
+    auto detectorCascade = main->tld->detectorCascade.get();
 	detectorCascade->varianceFilter->enabled = m_settings.m_varianceFilterEnabled;
 	detectorCascade->ensembleClassifier->enabled = m_settings.m_ensembleClassifierEnabled;
 	detectorCascade->nnClassifier->enabled = m_settings.m_nnClassifierEnabled;

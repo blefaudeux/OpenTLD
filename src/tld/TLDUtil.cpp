@@ -94,8 +94,8 @@ void tldExtractNormalizedPatchBB(Mat img, int * boundary, float * output) {
 	tldExtractNormalizedPatch(img, x,y,w,h,output);
 }
 
-void tldExtractNormalizedPatchRect(Mat img, Rect* rect, float * output) {
-	tldExtractNormalizedPatch(img, rect->x,rect->y,rect->width,rect->height,output);
+void tldExtractNormalizedPatchRect(Mat img, Rect & rect, float * output) {
+    tldExtractNormalizedPatch(img, rect.x, rect.y, rect.width, rect.height, output);
 }
 
 float CalculateMean(float * value, int n) {
@@ -144,30 +144,26 @@ void tldOverlapOne(int * windows, int numWindows, int index, vector<int> & indic
 	}
 }
 
-float tldOverlapRectRect(Rect r1, Rect r2) {
+float tldOverlapRectRect(Rect const & r1, Rect const & r2)
+{
 	int bb1[4];
 	int bb2[4];
 	tldRectToArray<int>(r1, bb1);
 	tldRectToArray<int>(r2, bb2);
 	return tldBBOverlap(bb1, bb2);
-
 }
 
-Rect* tldCopyRect(Rect* r) {
-	Rect* r2 = new Rect();
-	r2->x = r->x;
-	r2->y = r->y;
-	r2->width = r->width;
-	r2->height = r->height;
+Rect* tldCopyRect(Rect & r) {
+    Rect* r2 = new Rect(r);
 	return r2;
 }
 
-void tldOverlapRect(int * windows, int numWindows, Rect * boundary, float * overlap) {
+void tldOverlapRect(int * windows, int numWindows, Rect const & boundary, float * overlap) {
 	int bb[4];
-	bb[0] = boundary->x;
-	bb[1] = boundary->y;
-	bb[2] = boundary->width;
-	bb[3] = boundary->height;
+    bb[0] = boundary.x;
+    bb[1] = boundary.y;
+    bb[2] = boundary.width;
+    bb[3] = boundary.height;
 
 	tldOverlap(windows, numWindows, bb, overlap);
 }
@@ -178,10 +174,7 @@ void tldOverlap(int * windows, int numWindows, int * boundary, float * overlap) 
 
 		overlap[i] = tldBBOverlap(boundary, &windows[TLD_WINDOW_SIZE*i]);
 	}
-
 }
-
-
 
 
 bool tldSortByOverlapDesc(pair<int,float> bb1 , pair<int,float> bb2) {

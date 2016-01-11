@@ -40,26 +40,22 @@ TLD::TLD() {
 	valid = false;
 	wasValid = false;
 	learning = false;
-	currBB = NULL;
 
-	detectorCascade = new DetectorCascade();
-	nnClassifier = detectorCascade->nnClassifier;
+    detectorCascade.reset( new DetectorCascade() );
+    medianFlowTracker.reset( new MedianFlowTracker() );
 
-	medianFlowTracker = new MedianFlowTracker();
+    nnClassifier = detectorCascade->nnClassifier;
 	_img_posterios = NULL;
 }
 
 TLD::~TLD() {
 	storeCurrentData();
-	if(_img_posterios)cvReleaseImage(&_img_posterios);
-	delete detectorCascade;
-	delete medianFlowTracker;
+    if(_img_posterios)cvReleaseImage(&_img_posterios);
 }
 
 void TLD::release() {
 	detectorCascade->release();
-	medianFlowTracker->cleanPreviousData();
-	delete currBB;
+    medianFlowTracker->cleanPreviousData();
 }
 
 void TLD::storeCurrentData() {
@@ -73,18 +69,17 @@ void TLD::storeCurrentData() {
 	wasValid = valid;
 }
 
-void TLD::selectObject(Mat img, Rect * bb) {
+void TLD::selectObject(Mat img, Rect const & bb) {
 	//Delete old object
 	detectorCascade->release();
 
-	detectorCascade->objWidth = bb->width;
-	detectorCascade->objHeight = bb->height;
-
 	//Init detector cascade
+    detectorCascade->objWidth = bb.width;
+    detectorCascade->objHeight = bb.height;
 	detectorCascade->init();
 
 	currImg = img;
-	currBB = bb;
+    currBB.reset(new Rect(bb));
 	currConf = 1;
 	valid = true;
 
@@ -92,14 +87,16 @@ void TLD::selectObject(Mat img, Rect * bb) {
 
 }
 
-void TLD::processImage(Mat img) {
+void TLD::processImage(Mat img)
+{
 	storeCurrentData();
 	Mat grey_frame;
 	cvtColor( img,grey_frame, CV_RGB2GRAY );
 	currImg = grey_frame; // Store new image , right after storeCurrentData();
 
-	if(trackerEnabled) {
-		medianFlowTracker->track(prevImg, currImg, prevBB);
+    if(trackerEnabled)
+    {
+        medianFlowTracker->track(prevImg, currImg, *prevBB.get());
 	}
 
 	if(detectorEnabled && (!alternating || medianFlowTracker->trackerBB == NULL)) {
@@ -117,39 +114,49 @@ void TLD::drawDetection( IplImage * img) const {
 
 
 void TLD::fuseHypotheses() {
-	Rect* trackerBB = medianFlowTracker->trackerBB;
-	int numClusters = detectorCascade->detectionResult->numClusters;
-	Rect* detectorBB = detectorCascade->detectionResult->detectorBB;
+    auto const & trackerBB = medianFlowTracker->trackerBB;
+    auto const & detectorBB = detectorCascade->detectionResult->detectorBB;
+    int const numClusters = detectorCascade->detectionResult->numClusters;
 
-
-	currBB = NULL;
+    currBB.reset();
 	currConf = 0;
 	valid = false;
 
 	float confDetector = 0;
 
-	if(numClusters == 1) {
-		confDetector = nnClassifier->classifyBB(currImg, detectorBB);
+    if(numClusters == 1)
+    {
+        confDetector = nnClassifier->classifyBB(currImg, *detectorBB.get());
 	}
 
-	if(trackerBB != NULL) {
-		float confTracker = nnClassifier->classifyBB(currImg, trackerBB);
+    if( trackerBB )
+    {
+        float const confTracker = nnClassifier->classifyBB(currImg, *trackerBB.get());
 
-		if(numClusters == 1 && confDetector > confTracker && tldOverlapRectRect(*trackerBB, *detectorBB) < 0.5) {
+        if(numClusters == 1 && confDetector > confTracker && tldOverlapRectRect(*trackerBB.get(), *detectorBB.get()) < 0.5)
+        {
 
-			currBB = tldCopyRect(detectorBB);
+            currBB.reset(new Rect(*detectorBB.get()));
 			currConf = confDetector;
-		} else {
-			currBB = tldCopyRect(trackerBB);
+        }
+        else
+        {
+            currBB.reset( new Rect(*trackerBB.get()));
 			currConf = confTracker;
-			if(confTracker > nnClassifier->thetaTP) {
+
+            if(confTracker > nnClassifier->thetaTP)
+            {
 				valid = true;
-			} else if(wasValid && confTracker > nnClassifier->thetaFP) {
+
+            } else if(wasValid && confTracker > nnClassifier->thetaFP)
+            {
 				valid = true;
 			}
 		}
-	} else if(numClusters == 1) {
-		currBB = tldCopyRect(detectorBB);
+    }
+    else if(numClusters == 1)
+    {
+        currBB.reset( new Rect(*detectorBB.get()));
 		currConf = confDetector;
 	}
 
@@ -171,7 +178,7 @@ void TLD::initialLearning() {
 
 	//This is the positive patch
 	NormalizedPatch patch;
-	tldExtractNormalizedPatchRect(currImg, currBB, patch.values);
+    tldExtractNormalizedPatchRect(currImg, *currBB.get(), patch.values);
 	patch.positive = 1;
 
 	float initVar = tldCalcVariance(patch.values, TLD_PATCH_SIZE*TLD_PATCH_SIZE);
@@ -179,7 +186,7 @@ void TLD::initialLearning() {
 
 
 	float * overlap = new float[detectorCascade->numWindows];
-	tldOverlapRect(detectorCascade->windows, detectorCascade->numWindows, currBB,overlap);
+    tldOverlapRect(detectorCascade->windows, detectorCascade->numWindows, *currBB.get(), overlap);
 
 	//Add all bounding boxes with high overlap
 
@@ -253,10 +260,10 @@ void TLD::learn() {
 
 	//This is the positive patch
 	NormalizedPatch patch;
-	tldExtractNormalizedPatchRect(currImg, currBB, patch.values);
+    tldExtractNormalizedPatchRect(currImg, *currBB.get(), patch.values);
 
 	float * overlap = new float[detectorCascade->numWindows];
-	tldOverlapRect(detectorCascade->windows, detectorCascade->numWindows, currBB,overlap);
+    tldOverlapRect(detectorCascade->windows, detectorCascade->numWindows, *currBB.get(), overlap);
 
 	//Add all bounding boxes with high overlap
 

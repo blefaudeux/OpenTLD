@@ -91,7 +91,7 @@ void tldNormalizeImg(IplImage * img, float * result, int size);
 
 void tldExtractNormalizedPatch(Mat img, int x, int y, int w, int h, float * output);
 void tldExtractNormalizedPatchBB(Mat img, int * boundary, float * output);
-void tldExtractNormalizedPatchRect(Mat img, Rect* rect, float * output);
+void tldExtractNormalizedPatchRect(Mat img, Rect &rect, float * output);
 IplImage * tldExtractSubImage(IplImage * img, int * boundary);
 IplImage * tldExtractSubImage(IplImage * img, int x, int y, int w, int h);
 
@@ -99,13 +99,13 @@ float tldCalcMean(float * value, int n);
 float tldCalcVariance(float * value, int n);
 
 bool tldSortByOverlapDesc(pair<int,float> bb1 , pair<int,float> bb2);
-Rect* tldCopyRect(Rect* r);
+Rect* tldCopyRect(Rect &r);
 
 //TODO: Change function names
-float tldOverlapRectRect(Rect r1, Rect r2);
+float tldOverlapRectRect(Rect const & r1, Rect const & r2);
 void tldOverlapOne(int * windows, int numWindows, int index, vector<int> &indices, vector<float> &overlap);
 void tldOverlap(int * windows, int numWindows, int * boundary, float * overlap);
-void tldOverlapRect(int * windows, int numWindows, Rect * boundary, float * overlap);
+void tldOverlapRect(int * windows, int numWindows, Rect const &boundary, float * overlap);
 
 float tldCalcVariance(float * value, int n);
 

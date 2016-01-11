@@ -27,20 +27,24 @@
 #define MEDIANFLOWTRACKER_H_
 
 #include <opencv/cv.h>
+#include <memory>
 
 using namespace cv;
+using namespace std;
 
-namespace tld {
+namespace tld
+{
+    class MedianFlowTracker
+    {
+        public:
+            MedianFlowTracker();
+            virtual ~MedianFlowTracker();
+            void cleanPreviousData();
+            void track(Mat prevImg, Mat currImg, Rect & prevBB);
 
-class MedianFlowTracker {
-public:
-	Rect* trackerBB;
-
-	MedianFlowTracker();
-	virtual ~MedianFlowTracker();
-	void cleanPreviousData();
-	void track(Mat prevImg, Mat currImg, Rect* prevBB);
-};
+        public:
+            shared_ptr<Rect> trackerBB;
+    };
 
 } /* namespace tld */
 #endif /* MEDIANFLOWTRACKER_H_ */

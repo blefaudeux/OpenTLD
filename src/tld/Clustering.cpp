@@ -62,8 +62,8 @@ namespace tld {
         w /= numIndices;
         h /= numIndices;
 
-        Rect* rect = new Rect();
-        detectionResult->detectorBB = rect;
+        detectionResult->detectorBB.reset(new Rect());
+        auto & rect = detectionResult->detectorBB;
         rect->x = floor(x + 0.5);
         rect->y = floor(y + 0.5);
         rect->width = floor(w + 0.5);

@@ -30,11 +30,7 @@ namespace tld {
 
 DetectionResult::DetectionResult() {
 	containsValidData = false;
-	numClusters = 0;
-	detectorBB = NULL;
-	variances = NULL;
-	posteriors = NULL;
-	featureVectors = NULL;
+    numClusters = 0;
 }
 
 DetectionResult::~DetectionResult() {
@@ -42,9 +38,9 @@ DetectionResult::~DetectionResult() {
 }
 
 void DetectionResult::init(int numWindows, int numTrees) {
-	variances = new float[numWindows];
-	posteriors = new float[numWindows];
-	featureVectors = new int[numWindows*numTrees];
+    variances.resize(numWindows);
+    posteriors.resize(numWindows);
+    featureVectors.resize(numWindows*numTrees);
 }
 
 void DetectionResult::reset() {
@@ -52,26 +48,11 @@ void DetectionResult::reset() {
 	fgList.clear();
 	confidentIndices.clear();
 	numClusters = 0;
-	if(detectorBB) 
-		delete detectorBB;
-	detectorBB = NULL;
 }
 
 void DetectionResult::release() {
 	fgList.clear();
-	confidentIndices.clear();
-	if(variances) 
-		delete[] variances;
-	variances = NULL;
-	if(posteriors) 
-		delete[] posteriors;
-	posteriors = NULL;
-	if(featureVectors) 
-		delete[] featureVectors;
-	featureVectors = NULL;
-	if(detectorBB) 
-		delete detectorBB;
-	detectorBB = NULL;
+    confidentIndices.clear();
 	containsValidData = false;
 }
 
