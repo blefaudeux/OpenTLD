@@ -70,13 +70,12 @@ public:
 	bool initialised;
 
 	//Components of Detector Cascade
-	ForegroundDetector* foregroundDetector;
-	VarianceFilter* varianceFilter;
-	EnsembleClassifier* ensembleClassifier;
-	Clustering* clustering;
-	NNClassifier* nnClassifier;
-
-	DetectionResult* detectionResult;
+    std::shared_ptr<ForegroundDetector> foregroundDetector;
+    std::shared_ptr<VarianceFilter> varianceFilter;
+    std::shared_ptr<EnsembleClassifier> ensembleClassifier;
+    std::shared_ptr<Clustering> clustering;
+    std::shared_ptr<NNClassifier> nnClassifier;
+    std::shared_ptr<DetectionResult> detectionResult;
 
 	void propagateMembers();
 

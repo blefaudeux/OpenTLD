@@ -27,6 +27,7 @@
 #define CLUSTERING_H_
 
 #include <vector>
+#include <memory>
 #include <opencv/cv.h>
 
 #include "DetectionResult.h"
@@ -41,7 +42,7 @@ namespace tld
     {
             void calcMeanRect(vector<int> const &indices);
 
-            void calcDistances(vector<float> &distances);
+            void calcDistances(vector<float> &distances) const;
 
             void cluster(vector<float> const & distances, vector<int> & clusterIndices);
 
@@ -49,7 +50,7 @@ namespace tld
             int* windows;
             int numWindows;
 
-            DetectionResult* detectionResult;
+            std::shared_ptr<DetectionResult> detectionResult;
 
             //Configurable members
             float cutoff;

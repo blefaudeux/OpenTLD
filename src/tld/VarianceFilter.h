@@ -21,11 +21,15 @@
  *
  *  Created on: Nov 16, 2011
  *      Author: Georg Nebehay
+ *
+ *  Coding style modifications by Benjamin Lefaudeux
+ *  > moving to C++1x and Halide
  */
 
 #ifndef VARIANCEFILTER_H_
 #define VARIANCEFILTER_H_
 
+#include <memory>
 #include <opencv/cv.h>
 #include "IntegralImage.h"
 #include "DetectionResult.h"
@@ -42,7 +46,7 @@ namespace tld {
             bool enabled;
             int * windowOffsets;
 
-            DetectionResult * detectionResult;
+            std::shared_ptr<DetectionResult> detectionResult;
 
             float minVar;
 

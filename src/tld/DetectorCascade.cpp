@@ -52,23 +52,16 @@ DetectorCascade::DetectorCascade() {
 
 	initialised = false;
 
-	foregroundDetector = new ForegroundDetector();
-	varianceFilter = new VarianceFilter();
-	ensembleClassifier = new EnsembleClassifier();
-	nnClassifier = new NNClassifier();
-	clustering = new Clustering();
-
-	detectionResult = new DetectionResult();
+    foregroundDetector.reset( new ForegroundDetector() );
+    varianceFilter.reset( new VarianceFilter() );
+    ensembleClassifier.reset( new EnsembleClassifier() );
+    nnClassifier.reset( new NNClassifier() );
+    clustering.reset( new Clustering() );
+    detectionResult.reset( new DetectionResult() );
 }
 
 DetectorCascade::~DetectorCascade() {
 	release();
-
-	delete foregroundDetector;
-	delete varianceFilter;
-	delete ensembleClassifier;
-	delete nnClassifier;
-	delete detectionResult;
 }
 
 void DetectorCascade::init() {
@@ -103,11 +96,11 @@ void DetectorCascade::propagateMembers() {
 
 	foregroundDetector->minBlobSize = minSize*minSize;
 
-	foregroundDetector->detectionResult = detectionResult;
+    foregroundDetector->detectionResult = detectionResult;
 	varianceFilter->detectionResult = detectionResult;
 	ensembleClassifier->detectionResult = detectionResult;
 	nnClassifier->detectionResult = detectionResult;
-	clustering->detectionResult = detectionResult;
+    clustering->detectionResult = detectionResult;
 }
 
 void DetectorCascade::release() {

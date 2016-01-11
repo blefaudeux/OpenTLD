@@ -60,7 +60,7 @@ public:
 	int * positives;
 	int * negatives;
 
-	DetectionResult * detectionResult;
+    std::shared_ptr<DetectionResult> detectionResult;
 
 	EnsembleClassifier();
 	virtual ~EnsembleClassifier();

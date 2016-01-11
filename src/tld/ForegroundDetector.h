@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <opencv/cv.h>
+#include <memory>
 
 #include "DetectionResult.h"
 
@@ -41,7 +42,7 @@ public:
 	int fgThreshold;
 	int minBlobSize;
 	Mat bgImg;
-	DetectionResult * detectionResult;
+    std::shared_ptr<DetectionResult> detectionResult;
 
 	ForegroundDetector();
 	virtual ~ForegroundDetector();

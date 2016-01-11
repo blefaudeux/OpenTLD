@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <opencv/cv.h>
+#include <memory>
 
 #include "NormalizedPatch.h"
 #include "DetectionResult.h"
@@ -46,7 +47,7 @@ public:
 	int * windows;
 	float thetaFP;
 	float thetaTP;
-	DetectionResult* detectionResult;
+    std::shared_ptr<DetectionResult> detectionResult;
     vector<NormalizedPatch> falsePositives;
     vector<NormalizedPatch> truePositives;
 

@@ -48,7 +48,7 @@ public:
 
 	MedianFlowTracker* medianFlowTracker;
 	DetectorCascade* detectorCascade;
-	NNClassifier* nnClassifier;
+    std::shared_ptr<NNClassifier> nnClassifier;
 	bool valid;
 	bool wasValid;
 	Mat prevImg;

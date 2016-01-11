@@ -165,7 +165,7 @@ void TLD::fuseHypotheses() {
 void TLD::initialLearning() {
 	learning = true; //This is just for display purposes
 
-	DetectionResult* detectionResult = detectorCascade->detectionResult;
+    std::shared_ptr<DetectionResult> detectionResult = detectorCascade->detectionResult;
 
 	detectorCascade->detect(currImg);
 
@@ -245,7 +245,7 @@ void TLD::learn() {
 	}
 	learning = true;
 
-	DetectionResult* detectionResult = detectorCascade->detectionResult;
+    std::shared_ptr<DetectionResult> detectionResult = detectorCascade->detectionResult;
 
 	if(!detectionResult->containsValidData) {
 		detectorCascade->detect(currImg);
@@ -330,8 +330,8 @@ typedef struct {
 } TldExportEntry;
 
 void TLD::writeToFile(const char * path) {
-	NNClassifier * nn = detectorCascade->nnClassifier;
-	EnsembleClassifier* ec = detectorCascade->ensembleClassifier;
+    std::shared_ptr<NNClassifier> nn = detectorCascade->nnClassifier;
+    std::shared_ptr<EnsembleClassifier> ec = detectorCascade->ensembleClassifier;
 
 	FILE * file = fopen(path, "w");
 	fprintf(file,"#Tld ModelExport\n");
@@ -403,8 +403,8 @@ void TLD::writeToFile(const char * path) {
 void TLD::readFromFile(const char * path) {
 	release();
 
-	NNClassifier * nn = detectorCascade->nnClassifier;
-	EnsembleClassifier* ec = detectorCascade->ensembleClassifier;
+    std::shared_ptr<NNClassifier> nn = detectorCascade->nnClassifier;
+    std::shared_ptr<EnsembleClassifier> ec = detectorCascade->ensembleClassifier;
 
 	FILE * file = fopen(path, "r");
 

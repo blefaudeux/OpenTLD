@@ -34,26 +34,28 @@ using namespace cv;
 
 namespace tld {
 
-class DetectionResult {
-public:
-	bool containsValidData;
-	vector<Rect> fgList;
-	float * posteriors; /* Contains the posteriors for each slding window. Is of size numWindows. Allocated by tldInitClassifier. */
-	vector<int> confidentIndices;
-	int * featureVectors;
-	float * variances;
-	int numClusters;
-	Rect* detectorBB; //Contains a valid result only if numClusters = 1
+    class DetectionResult {
+        public:
+            DetectionResult();
+            virtual ~DetectionResult();
 
-	DetectionResult();
-	virtual ~DetectionResult();
+            void init(int numWindows, int numTrees);
 
-	void init(int numWindows, int numTrees);
+            void reset();
+            void release();
 
-	void reset();
-	void release();
 
-};
+        public:
+            vector<Rect> fgList;
+            float * posteriors; /* Contains the posteriors for each sliding window. Is of size numWindows. Allocated by tldInitClassifier. */
+            vector<int> confidentIndices;
+            int * featureVectors;
+            float * variances;
+            int numClusters;
+            Rect* detectorBB; //Contains a valid result only if numClusters = 1
+
+            bool containsValidData;
+    };
 
 } /* namespace tld */
 #endif /* DETECTIONRESULT_H_ */
