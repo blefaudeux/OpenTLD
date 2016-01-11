@@ -75,9 +75,6 @@ if(WIN32)
 else()
 	find_package(OpenCV REQUIRED)
     include_directories(${OpenCV_INCLUDE_DIRS})
-    message(STATUS "OpenCV_DIR is ${OpenCV_DIR}")
-    message(STATUS "OpenCV includes are ${OpenCV_INCLUDE_DIRS}")
-    message(STATUS "OpenCV libs are ${OpenCV_LIBS}")
 endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
@@ -85,6 +82,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgomp")
 
 include_directories(src/cvblobs src/imacq src/config src/tld src/mftracker src/main ${OpenCV_INCLUDE_DIRS})
+
+# Build Halide
+set(HALIDE halide)
+add_custom_target(
+    halide
+    cd ${CMAKE_SOURCE_DIR}/dependencies/Halide && make
+)
 
 #-------------------------------------------------------------------------------
 #add subdirectories
@@ -95,6 +99,8 @@ add_subdirectory(src/tld)
 add_subdirectory(src/mftracker)
 add_subdirectory(src/main)
 add_subdirectory(src)
+
+add_dependencies(opentld ${HALIDE})
 
 configure_file("${PROJECT_SOURCE_DIR}/OpenTLDConfig.cmake.in" "${PROJECT_BINARY_DIR}/OpenTLDConfig.cmake" @ONLY)
 
