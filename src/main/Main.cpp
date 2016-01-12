@@ -39,9 +39,10 @@
     IplImage * grey = cvCreateImage( cvGetSize(img), 8, 1 ); // FIXME: Memleak over there
     cvCvtColor( img,grey, CV_BGR2GRAY );
 
-    tld->detectorCascade->imgWidth = grey->width;
-    tld->detectorCascade->imgHeight = grey->height;
-    tld->detectorCascade->imgWidthStep = grey->widthStep;
+    auto detector = tld->detector();
+    detector->imgWidth = grey->width;
+    detector->imgHeight = grey->height;
+    detector->imgWidthStep = grey->widthStep;
 
     if(selectManually) {
 
@@ -120,10 +121,15 @@
             skipProcessingOnce = false;
         }
 
-        if(printResults != NULL) {
-            if(tld->currBB != NULL) {
-                fprintf(resultsFile, "%d %.2d %.2d %.2d %.2d %f\n", imAcq->currentFrame-1, tld->currBB->x, tld->currBB->y, tld->currBB->width, tld->currBB->height, tld->currConf);
-            } else {
+        if(printResults != NULL)
+        {
+            if( !tld->currBB )
+            {
+                fprintf(resultsFile, "%d %.2d %.2d %.2d %.2d %f\n", imAcq->currentFrame-1,
+                        tld->currBB->x, tld->currBB->y, tld->currBB->width, tld->currBB->height, tld->confidence());
+            }
+            else
+            {
                 fprintf(resultsFile, "%d NaN NaN NaN NaN NaN\n", imAcq->currentFrame-1);
             }
         }
@@ -134,26 +140,28 @@
 
         float fps = 1/toc;
 
-        int confident = (tld->currConf >= threshold) ? 1 : 0;
+        float const tldConfidence = tld->confidence();
+        int const confident = (tldConfidence >= threshold) ? 1 : 0;
 
         if(showOutput || saveDir != NULL) {
             char string[128];
 
             char learningString[10] = "";
-            if(tld->learning) {
+
+            if(tld->isLearning())
+            {
                 strcpy(learningString, "Learning");
             }
 
-            sprintf(string, "#%d,Posterior %.2f; fps: %.2f, #numwindows:%d, %s", imAcq->currentFrame-1, tld->currConf, fps, tld->detectorCascade->numWindows, learningString);
+            sprintf(string, "#%d,Posterior %.2f; fps: %.2f, #numwindows:%d, %s", imAcq->currentFrame-1,
+                    tldConfidence, fps, tld->detector()->numWindows, learningString);
+
             CvScalar yellow = CV_RGB(255,255,0);
             CvScalar blue = CV_RGB(0,0,255);
             CvScalar black = CV_RGB(0,0,0);
             CvScalar white = CV_RGB(255,255,255);
 
             if(tld->currBB != NULL) {
-                //CvScalar rectangleColor = (confident) ? blue : yellow;
-                //cvRectangle(img, tld->currBB->tl(), tld->currBB->br(), rectangleColor, 8, 8, 0);
-                //printf("Top Left: %d, %d. Bottom Right: %d, %d.\n", tld->currBB->tl().x, tld->currBB->tl().y, tld->currBB->br().x, tld->currBB->br().y);
                 int x_avg = (tld->currBB->tl().x >> 1) + (tld->currBB->br().x >> 1) + 100;
                 int y_avg = (tld->currBB->tl().y >> 1) + (tld->currBB->br().y >> 1) + 120;
                 std::ostringstream sin1;
@@ -176,10 +184,10 @@
             cvRectangle(img, cvPoint(0,0), cvPoint(img->width,50), black, CV_FILLED, 8, 0);
             cvPutText(img, string, cvPoint(25,25), &font, white);
 
-            if(showForeground) {
-
-                for(size_t i = 0; i < tld->detectorCascade->detectionResult->fgList.size(); i++) {
-                    Rect r = tld->detectorCascade->detectionResult->fgList[i];
+            if(showForeground)
+            {
+                for(auto const & r : tld->detector()->detectionResult->fgList )
+                {
                     cvRectangle(img, r.tl(),r.br(), white, 1);
                 }
 
@@ -193,7 +201,7 @@
 
                 if(key == 'b')
                 {
-                    std::shared_ptr<ForegroundDetector> fg = tld->detectorCascade->foregroundDetector;
+                    auto fg = tld->detector()->foregroundDetector;
 
                     if(fg->bgImg.empty())
                     {
@@ -212,13 +220,13 @@
                 }
 
                 if(key == 'l') {
-                    tld->learningEnabled = !tld->learningEnabled;
-                    printf("LearningEnabled: %d\n", tld->learningEnabled);
+                    tld->setLearning(!tld->isLearning());
+                    printf("LearningEnabled: %d\n", tld->isLearning());
                 }
 
                 if(key == 'a') {
-                    tld->alternating = !tld->alternating;
-                    printf("alternating: %d\n", tld->alternating);
+                    tld->setAlternating(!tld->isAlternating());
+                    printf("alternating: %d\n", tld->isAlternating());
                 }
 
                 if(key == 'e') {

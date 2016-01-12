@@ -30,6 +30,7 @@
 
 #include "MedianFlowTracker.h"
 #include "DetectorCascade.h"
+#include <memory>
 
 using namespace cv;
 using namespace std;
@@ -37,11 +38,40 @@ using namespace std;
 namespace tld {
 
     class TLD {
+
+        public:
+            TLD();
+            virtual ~TLD();
+            void release();
+            void selectObject(Mat img, Rect const & bb);
+            void processImage(Mat img);
+            void writeToFile(const char * path);
+            void readFromFile(const char * path);
+            void drawDetection(IplImage * img) const;
+            Mat  drawPosterios();
+
+        public:
+            // Get / Sets
+            shared_ptr<DetectorCascade> const & detector() const { return detectorCascade; }
+            inline float confidence() const { return currConf; }
+            inline bool isLearning() const { return learningEnabled; }
+            inline bool isAlternating() const { return alternating; }
+
+
+            void setTracker(bool status) { trackerEnabled = status; }
+            void setLearning(bool status) { learningEnabled = status; }
+            void setAlternating(bool status) { alternating = status; }
+
+        public :
+            shared_ptr<Rect> currBB;
+
+        private:
             void storeCurrentData();
             void fuseHypotheses();
             void learn();
             void initialLearning();
-        public:
+
+        private:
             bool trackerEnabled;
             bool detectorEnabled;
             bool learningEnabled;
@@ -53,7 +83,6 @@ namespace tld {
             Mat currImg;
 
             shared_ptr<Rect> prevBB;
-            shared_ptr<Rect> currBB;
 
             shared_ptr<MedianFlowTracker> medianFlowTracker;
             shared_ptr<DetectorCascade> detectorCascade;
@@ -62,17 +91,6 @@ namespace tld {
             float currConf;
             bool learning;
 
-            TLD();
-            virtual ~TLD();
-            void release();
-            void selectObject(Mat img, Rect const & bb);
-            void processImage(Mat img);
-            void writeToFile(const char * path);
-            void readFromFile(const char * path);
-            void drawDetection(IplImage * img) const;
-            Mat  drawPosterios();
-
-        private :
             IplImage * _img_posterios;
     };
 
