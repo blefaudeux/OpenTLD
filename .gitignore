@@ -18,3 +18,4 @@ cmake_install.cmake
 build_vc10/
 build/tld
 
+dependencies/Halide/*
