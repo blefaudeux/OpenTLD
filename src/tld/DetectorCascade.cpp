@@ -54,17 +54,19 @@ DetectorCascade::DetectorCascade() {
 
     foregroundDetector.reset( new ForegroundDetector() );
     varianceFilter.reset( new VarianceFilter() );
-    ensembleClassifier.reset( new EnsembleClassifier() );
+    ensembleClassifier.reset( new EnsembleClassifier( *this ) );
     nnClassifier.reset( new NNClassifier() );
     clustering.reset( new Clustering() );
     detectionResult.reset( new DetectionResult() );
 }
 
-DetectorCascade::~DetectorCascade() {
+DetectorCascade::~DetectorCascade()
+{
 	release();
 }
 
-void DetectorCascade::init() {
+void DetectorCascade::init()
+{
 	if(imgWidth == -1 || imgHeight == -1 || imgWidthStep == -1 || objWidth == -1 || objHeight == -1) {
 		//printf("Error: Window dimensions not set\n"); //TODO: Convert this to exception
 	}
@@ -73,9 +75,7 @@ void DetectorCascade::init() {
 	initWindowOffsets();
 
 	propagateMembers();
-
 	ensembleClassifier->init();
-
 	initialised = true;
 }
 
@@ -84,12 +84,7 @@ void DetectorCascade::propagateMembers() {
 	detectionResult->init(numWindows, numTrees);
 
 	varianceFilter->windowOffsets = windowOffsets;
-	ensembleClassifier->windowOffsets = windowOffsets;
-	ensembleClassifier->imgWidthStep = imgWidthStep;
-	ensembleClassifier->numScales = numScales;
-	ensembleClassifier->scales = scales;
-	ensembleClassifier->numFeatures = numFeatures;
-	ensembleClassifier->numTrees = numTrees;
+
 	nnClassifier->windows = windows;
 	clustering->windows = windows;
 	clustering->numWindows = numWindows;
@@ -98,7 +93,6 @@ void DetectorCascade::propagateMembers() {
 
     foregroundDetector->detectionResult = detectionResult;
 	varianceFilter->detectionResult = detectionResult;
-	ensembleClassifier->detectionResult = detectionResult;
 	nnClassifier->detectionResult = detectionResult;
     clustering->detectionResult = detectionResult;
 }

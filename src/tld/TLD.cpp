@@ -360,32 +360,35 @@ void TLD::writeToFile(const char * path) {
 
     fprintf(file,"%d #Negative Sample Size\n", nn->falsePositives.size());
 
-    for(size_t s = 0; s < nn->falsePositives.size();s++) {
+    for(size_t s = 0; s < nn->falsePositives.size();s++)
+    {
         float * imageData = nn->falsePositives[s].values;
-		for(int i = 0; i < TLD_PATCH_SIZE; i++) {
-			for(int j = 0; j < TLD_PATCH_SIZE; j++) {
+        for(int i = 0; i < TLD_PATCH_SIZE; i++)
+        {
+            for(int j = 0; j < TLD_PATCH_SIZE; j++)
+            {
 				fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
 			}
 			fprintf(file, "\n");
 		}
 	}
 
-	fprintf(file,"%d #numtrees\n", ec->numTrees);
-	detectorCascade->numTrees = ec->numTrees;
-	fprintf(file,"%d #numFeatures\n", ec->numFeatures);
-	detectorCascade->numFeatures = ec->numFeatures;
-	for(int i = 0; i < ec->numTrees; i++) {
+    fprintf(file,"%d #numtrees\n", ec->dtc.numTrees);
+    detectorCascade->numTrees = ec->dtc.numTrees;
+    fprintf(file,"%d #numFeatures\n", ec->dtc.numFeatures);
+    detectorCascade->numFeatures = ec->dtc.numFeatures;
+    for(int i = 0; i < ec->dtc.numTrees; i++) {
 		fprintf(file, "#Tree %d\n", i);
 
-		for(int j = 0; j < ec->numFeatures; j++) {
-			float * features = ec->features + 4*ec->numFeatures*i + 4*j;
+        for(int j = 0; j < ec->dtc.numFeatures; j++) {
+            float * features = ec->features + 4*ec->dtc.numFeatures*i + 4*j;
 			fprintf(file,"%f %f %f %f # Feature %d\n", features[0], features[1], features[2], features[3], j);
 		}
 
 		//Collect indices
 		vector<TldExportEntry> list;
 
-		for(int index = 0; index < pow(2.0f, ec->numFeatures); index++) {
+        for(int index = 0; index < pow(2.0f, ec->dtc.numFeatures); index++) {
 			int p = ec->positives[i * ec->numIndices + index];
 			if(p != 0) {
 				TldExportEntry entry;
@@ -489,24 +492,24 @@ void TLD::readFromFile(const char * path) {
         nn->falsePositives.push_back(patch);
 	}
 
-	fscanf(file,"%d \n", &ec->numTrees);
-	detectorCascade->numTrees = ec->numTrees;
+    fscanf(file,"%d \n", &ec->dtc.numTrees);
+    detectorCascade->numTrees = ec->dtc.numTrees;
 	fgets(str_buf, MAX_LEN, file); /*Skip rest of line*/
 
-	fscanf(file,"%d \n", &ec->numFeatures);
-	detectorCascade->numFeatures = ec->numFeatures;
+    fscanf(file,"%d \n", &ec->dtc.numFeatures);
+    detectorCascade->numFeatures = ec->dtc.numFeatures;
 	fgets(str_buf, MAX_LEN, file); /*Skip rest of line*/
 
-	int size = 2 * 2 * ec->numFeatures * ec->numTrees;
+    int size = 2 * 2 * ec->dtc.numFeatures * ec->dtc.numTrees;
 	ec->features = new float[size];
-	ec->numIndices = pow(2.0f, ec->numFeatures);
+    ec->numIndices = pow(2.0f, ec->dtc.numFeatures);
 	ec->initPosteriors();
 
-	for(int i = 0; i < ec->numTrees; i++) {
+    for(int i = 0; i < ec->dtc.numTrees; i++) {
 		fgets(str_buf, MAX_LEN, file); /*Skip line*/
 
-		for(int j = 0; j < ec->numFeatures; j++) {
-			float * features = ec->features + 4*ec->numFeatures*i + 4*j;
+        for(int j = 0; j < ec->dtc.numFeatures; j++) {
+            float * features = ec->features + 4*ec->dtc.numFeatures*i + 4*j;
 			fscanf(file, "%f %f %f %f",&features[0], &features[1], &features[2], &features[3]);
 			fgets(str_buf, MAX_LEN, file); /*Skip rest of line*/
 		}
@@ -585,7 +588,7 @@ static CvScalar * DRAW_vector_map(int size) {
 }
 
 Mat TLD::drawPosterios() {
-	int T = detectorCascade->ensembleClassifier->numTrees;
+    int T = detectorCascade->numTrees;
 	int I = detectorCascade->ensembleClassifier->numIndices;
 	if(_img_posterios == NULL) {
 		_img_posterios = cvCreateImage(cvSize(I,T),8,3);

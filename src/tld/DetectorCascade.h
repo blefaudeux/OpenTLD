@@ -37,61 +37,64 @@
 
 namespace tld {
 
-//Constants
-static const int TLD_WINDOW_SIZE = 5;
-static const int TLD_WINDOW_OFFSET_SIZE = 6;
+    //Constants
+    static const int TLD_WINDOW_SIZE = 5;
+    static const int TLD_WINDOW_OFFSET_SIZE = 6;
 
-class DetectorCascade {
-	//Working data
-	int numScales;
-	Size* scales;
-public:
-	//Configurable members
-	int minScale;
-	int maxScale;
-	bool useShift;
-	float shift;
-	int minSize;
-	int numFeatures;
-	int numTrees;
+    class DetectorCascade {
 
-	//Needed for init
-	int imgWidth;
-	int imgHeight;
-	int imgWidthStep;
-	int objWidth;
-	int objHeight;
+            friend class EnsembleClassifier;
 
-	int numWindows;
-	int* windows;
-	int* windowOffsets;
+            //Working data
+            int numScales;
+            Size* scales;
+        public:
+            //Configurable members
+            int minScale;
+            int maxScale;
+            bool useShift;
+            float shift;
+            int minSize;
+            int numFeatures;
+            int numTrees;
 
-	//State data
-	bool initialised;
+            //Needed for init
+            int imgWidth;
+            int imgHeight;
+            int imgWidthStep;
+            int objWidth;
+            int objHeight;
 
-	//Components of Detector Cascade
-    std::shared_ptr<ForegroundDetector> foregroundDetector;
-    std::shared_ptr<VarianceFilter> varianceFilter;
-    std::shared_ptr<EnsembleClassifier> ensembleClassifier;
-    std::shared_ptr<Clustering> clustering;
-    std::shared_ptr<NNClassifier> nnClassifier;
-    std::shared_ptr<DetectionResult> detectionResult;
+            int numWindows;
+            int* windows;
+            int* windowOffsets;
 
-	void propagateMembers();
+            //State data
+            bool initialised;
 
-	DetectorCascade();
-	~DetectorCascade();
+            //Components of Detector Cascade
+            std::shared_ptr<ForegroundDetector> foregroundDetector;
+            std::shared_ptr<VarianceFilter> varianceFilter;
+            std::shared_ptr<EnsembleClassifier> ensembleClassifier;
+            std::shared_ptr<Clustering> clustering;
+            std::shared_ptr<NNClassifier> nnClassifier;
+            std::shared_ptr<DetectionResult> detectionResult;
 
-	void init();
+            void propagateMembers();
 
-	void initWindowOffsets();
-	void initWindowsAndScales();
+            DetectorCascade();
+            ~DetectorCascade();
 
-	void release();
-	void cleanPreviousData();
-	void detect(Mat img);
-	void drawDetection(IplImage * img) const;
-};
+            void init();
+
+            void initWindowOffsets();
+            void initWindowsAndScales();
+
+            void release();
+            void cleanPreviousData();
+            void detect(Mat img);
+            void drawDetection(IplImage * img) const;
+    };
 
 } /* namespace tld */
 #endif /* DETECTORCASCADE_H_ */

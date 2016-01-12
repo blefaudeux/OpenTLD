@@ -29,52 +29,52 @@
 #include <opencv/cv.h>
 
 using namespace cv;
+using namespace std;
 
 namespace tld {
 
-class EnsembleClassifier {
-	unsigned char* img;
+    // Fw
+    class DetectorCascade;
 
-	float calcConfidence(int * featureVector);
-	int calcFernFeature(int windowIdx, int treeIdx);
-	void calcFeatureVector(int windowIdx, int * featureVector);
-	void updatePosteriors(int *featureVector, int positive, int amount);
-public:
-	bool enabled;
+    class EnsembleClassifier
+    {
+            friend class TLD;
 
-	//Configurable members
-	int numTrees;
-	int numFeatures;
+        public:
+            EnsembleClassifier( DetectorCascade & dc);
+            virtual ~EnsembleClassifier();
+            void init();
+            void initFeatureLocations();
+            void initFeatureOffsets();
+            void initPosteriors();
+            void release();
+            void nextIteration(Mat img);
+            void classifyWindow(int windowIdx);
+            void updatePosterior(int treeIdx, int idx, int positive, int amount);
+            void learn(int positive, int * featureVector);
+            bool filter(int i);
 
-	int imgWidthStep;
-	int numScales;
-	Size* scales;
+            float calcConfidence(int * featureVector);
+            int calcFernFeature(int windowIdx, int treeIdx);
+            void calcFeatureVector(int windowIdx, int * featureVector);
+            void updatePosteriors(int *featureVector, int positive, int amount);
 
-	int* windowOffsets;
-	int* featureOffsets;
-	float* features;
+        public:
+            bool enabled;
 
-	int numIndices;
+        private:
+            int* featureOffsets;
+            float* features;
 
-	float * posteriors;
-	int * positives;
-	int * negatives;
+            int numIndices;
 
-    std::shared_ptr<DetectionResult> detectionResult;
+            float * posteriors;
+            int * positives;
+            int * negatives;
 
-	EnsembleClassifier();
-	virtual ~EnsembleClassifier();
-	void init();
-	void initFeatureLocations();
-	void initFeatureOffsets();
-	void initPosteriors();
-	void release();
-	void nextIteration(Mat img);
-	void classifyWindow(int windowIdx);
-	void updatePosterior(int treeIdx, int idx, int positive, int amount);
-	void learn(int positive, int * featureVector);
-	bool filter(int i);
-};
+            DetectorCascade & dtc;
+            unsigned char* img;
+    };
 
 } /* namespace tld */
 #endif /* ENSEMBLECLASSIFIER_H_ */
