@@ -123,10 +123,12 @@
 
         if(printResults != NULL)
         {
-            if( !tld->currBB )
+            auto currBB = tld->boundingBox();
+
+            if( currBB.get() )
             {
                 fprintf(resultsFile, "%d %.2d %.2d %.2d %.2d %f\n", imAcq->currentFrame-1,
-                        tld->currBB->x, tld->currBB->y, tld->currBB->width, tld->currBB->height, tld->confidence());
+                        currBB->x, currBB->y, currBB->width, currBB->height, tld->confidence());
             }
             else
             {
@@ -134,16 +136,14 @@
             }
         }
 
-        double toc = (cvGetTickCount() - tic)/cvGetTickFrequency();
-
-        toc = toc / 1000000;
-
-        float fps = 1/toc;
+        float const toc = (cvGetTickCount() - tic)/cvGetTickFrequency() / 1000000;
+        float const fps = 1/toc;
 
         float const tldConfidence = tld->confidence();
         int const confident = (tldConfidence >= threshold) ? 1 : 0;
 
-        if(showOutput || saveDir != NULL) {
+        if(showOutput || saveDir != NULL)
+        {
             char string[128];
 
             char learningString[10] = "";
@@ -161,9 +161,12 @@
             CvScalar black = CV_RGB(0,0,0);
             CvScalar white = CV_RGB(255,255,255);
 
-            if(tld->currBB != NULL) {
-                int x_avg = (tld->currBB->tl().x >> 1) + (tld->currBB->br().x >> 1) + 100;
-                int y_avg = (tld->currBB->tl().y >> 1) + (tld->currBB->br().y >> 1) + 120;
+            auto currBB = tld->boundingBox();
+
+            if( currBB.get() )
+            {
+                int x_avg = (currBB->tl().x >> 1) + (currBB->br().x >> 1) + 100;
+                int y_avg = (currBB->tl().y >> 1) + (currBB->br().y >> 1) + 120;
                 std::ostringstream sin1;
                 sin1 << (x_avg);
                 std::string s2 = sin1.str();
@@ -173,7 +176,7 @@
                 std::string cmd = "./click -x " + s2 + " -y " + s3;
                 //system(cmd.c_str());
                 tld->drawDetection(img);
-                cvRectangle(img,cvPoint(tld->currBB->x,tld->currBB->y),cvPoint(tld->currBB->x+tld->currBB->width,tld->currBB->y+tld->currBB->height),CV_RGB(0,255,255),2);
+                cvRectangle(img,cvPoint(currBB->x, currBB->y),cvPoint(currBB->x + currBB->width, currBB->y + currBB->height),CV_RGB(0,255,255),2);
                 Mat img_desciptor = tld->drawPosterios();
                 Mat mat(img);
                 img_desciptor.copyTo(mat(cv::Rect(0,0,img_desciptor.cols,img_desciptor.rows)));

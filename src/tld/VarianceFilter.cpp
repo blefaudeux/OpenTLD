@@ -31,9 +31,7 @@ namespace tld {
 
 VarianceFilter::VarianceFilter() {
 	enabled = true;
-	minVar = 0;
-	integralImg = NULL;
-	integralImg_squared = NULL;
+    minVar = 0;
 }
 
 VarianceFilter::~VarianceFilter() {
@@ -41,11 +39,8 @@ VarianceFilter::~VarianceFilter() {
 }
 
 void VarianceFilter::release() {
-	if(integralImg != NULL) delete integralImg;
-	integralImg = NULL;
-
-	if(integralImg_squared != NULL) delete integralImg_squared;
-	integralImg_squared = NULL;
+    integralImg.reset();
+    integralImg_squared.reset();
 }
 
 float VarianceFilter::calcVariance(int *off) {
@@ -63,21 +58,25 @@ void VarianceFilter::nextIteration(Mat img) {
 
 	release();
 
-	integralImg = new IntegralImage<int>(img.size());
+    integralImg.reset( new IntegralImage<int>(img.size()) );
 	integralImg->calcIntImg(img);
 
-	integralImg_squared = new IntegralImage<long long>(img.size());
+    integralImg_squared.reset( new IntegralImage<long long>(img.size()) );
 	integralImg_squared->calcIntImg(img, true);
 }
 
 bool VarianceFilter::filter(int i) {
-	if(!enabled) return true;
+    if(!enabled)
+    {
+        return true;
+    }
 
-	float bboxvar = calcVariance(windowOffsets + TLD_WINDOW_OFFSET_SIZE*i);
+    float const bboxvar = calcVariance(windowOffsets + TLD_WINDOW_OFFSET_SIZE*i);
 
 	detectionResult->variances[i] = bboxvar;
 
-	if(bboxvar < minVar) {
+    if(bboxvar < minVar)
+    {
 		return false;
 	}
 

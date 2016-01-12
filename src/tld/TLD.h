@@ -21,6 +21,9 @@
  *
  *  Created on: Nov 17, 2011
  *      Author: Georg Nebehay
+ *
+ *  Coding style modifications by Benjamin Lefaudeux
+ *  > moving to C++1x and Halide
  */
 
 #ifndef TLD_H_
@@ -53,6 +56,8 @@ namespace tld {
         public:
             // Get / Sets
             shared_ptr<DetectorCascade> const & detector() const { return detectorCascade; }
+            shared_ptr<Rect> const & boundingBox() const { return currBB; }
+
             inline float confidence() const { return currConf; }
             inline bool isLearning() const { return learningEnabled; }
             inline bool isAlternating() const { return alternating; }
@@ -61,9 +66,6 @@ namespace tld {
             void setTracker(bool status) { trackerEnabled = status; }
             void setLearning(bool status) { learningEnabled = status; }
             void setAlternating(bool status) { alternating = status; }
-
-        public :
-            shared_ptr<Rect> currBB;
 
         private:
             void storeCurrentData();
@@ -83,6 +85,7 @@ namespace tld {
             Mat currImg;
 
             shared_ptr<Rect> prevBB;
+            shared_ptr<Rect> currBB;
 
             shared_ptr<MedianFlowTracker> medianFlowTracker;
             shared_ptr<DetectorCascade> detectorCascade;
