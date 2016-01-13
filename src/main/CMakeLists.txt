@@ -5,5 +5,4 @@ add_library(main ${MAIN_SOURCES})
 
 include_directories(../imacq ../tld ../config)
 
-set(halide_link_lib "-L ${PROJECT_SOURCE_DIR}/dependencies/Halide/bin/ -lHalide")
-target_link_libraries(main imacq tld config ${halide_link_lib})
+target_link_libraries(main imacq tld config ${PROJECT_SOURCE_DIR}/dependencies/Halide/bin/libHalide.so)
