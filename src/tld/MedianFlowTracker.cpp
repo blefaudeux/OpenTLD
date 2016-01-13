@@ -29,20 +29,25 @@
 
 namespace tld {
 
-    MedianFlowTracker::MedianFlowTracker() {
+    MedianFlowTracker::MedianFlowTracker()
+    {
         trackerBB = NULL;
     }
 
-    MedianFlowTracker::~MedianFlowTracker() {
+    MedianFlowTracker::~MedianFlowTracker()
+    {
         cleanPreviousData();
     }
 
-    void MedianFlowTracker::cleanPreviousData() {
+    void MedianFlowTracker::cleanPreviousData()
+    {
         trackerBB.reset();
     }
 
-    void MedianFlowTracker::track(Mat prevMat, Mat currMat, Rect & prevBB) {
-        if(prevBB.width <= 0 || prevBB.height <= 0) {
+    void MedianFlowTracker::track(Mat prevMat, Mat currMat, Rect const & prevBB)
+    {
+        if(prevBB.width <= 0 || prevBB.height <= 0)
+        {
             return;
         }
 

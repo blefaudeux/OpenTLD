@@ -58,13 +58,13 @@ void ForegroundDetector::nextIteration(Mat img) {
 
 	blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, minBlobSize );
 
-	vector<Rect>* fgList = &detectionResult->fgList;
-	fgList->clear();
+    vector<Rect> & fgList = detectionResult->fgList;
+    fgList.clear();
 
 	for(int i = 0; i < blobs.GetNumBlobs(); i++) {
 		CBlob * blob = blobs.GetBlob(i);
 		CvRect rect = blob->GetBoundingBox();
-		fgList->push_back(rect);
+        fgList.push_back(rect);
 	}
 
 }

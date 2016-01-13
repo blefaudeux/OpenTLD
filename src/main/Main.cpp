@@ -33,6 +33,8 @@
 #include <string>
 #include <sstream>
 
+#include "halide_experiments.h"
+
  void Main::doWork() {
 
     IplImage * img = imAcqGetImg(imAcq);
@@ -114,7 +116,12 @@
         }
 
         if(!skipProcessingOnce) {
-            cv::blur(Mat(img),Mat(img),cv::Size(3,3));
+            // DEBUG: Ben - test Halide in there
+//            cv::blur(Mat(img),Mat(img),cv::Size(3,3));
+
+            Mat img_out(img->width, img->height, CV_8UC1);
+            hexp::halide_blur(img_out, Mat(img));
+
             tld->processImage(img);
 
         } else {

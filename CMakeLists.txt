@@ -89,6 +89,7 @@ add_custom_target(
     halide
     cd ${CMAKE_SOURCE_DIR}/dependencies/Halide && make
 )
+include_directories(${CMAKE_SOURCE_DIR}/dependencies)
 
 #-------------------------------------------------------------------------------
 #add subdirectories

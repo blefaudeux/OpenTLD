@@ -40,7 +40,7 @@ namespace tld
             MedianFlowTracker();
             virtual ~MedianFlowTracker();
             void cleanPreviousData();
-            void track(Mat prevImg, Mat currImg, Rect & prevBB);
+            void track(Mat prevImg, Mat currImg, Rect const & prevBB);
 
         public:
             shared_ptr<Rect> trackerBB;
