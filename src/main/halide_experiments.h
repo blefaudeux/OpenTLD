@@ -6,6 +6,9 @@
 namespace hexp
 {
     void halide_blur(cv::Mat output, cv::Mat input);
+
+    void halide_fast_blur(cv::Mat output, cv::Mat input);
+
 }
 
 #endif // HALIDE_EXPERIMENTS_H
