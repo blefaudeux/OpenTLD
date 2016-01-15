@@ -26,6 +26,5 @@ namespace hexp
 
         out.set_min(1, 1);
         blur_y.realize(out);
-
     }
 }
