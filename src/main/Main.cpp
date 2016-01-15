@@ -120,7 +120,7 @@
 //            cv::blur(Mat(img),Mat(img),cv::Size(3,3));
 
             Mat img_out(img->width, img->height, CV_8UC1);
-            hexp::halide_blur(img_out, Mat(img));
+            hexp::halide_blur_minimal(img_out, Mat(img));
 
             tld->processImage(img);
 

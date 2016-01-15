@@ -8,36 +8,24 @@ namespace hexp
 {
     using namespace Halide;
 
-    void halide_blur(cv::Mat output, cv::Mat input)
+    void halide_blur_minimal(cv::Mat output, cv::Mat input)
     {
         // Load the picture from the OpenCV raw buffer
         Image<uint8_t> in( Buffer(UInt(8), input.cols, input.rows, 1, 0, input.data ) );
-        Image<uint8_t> out( Buffer(UInt(8), input.cols, input.rows, 1, 0, output.data ) );
-
-        // Define a 3x3 Gaussian Blur with a repeat-edge boundary condition.
-        // cf. https://github.com/halide/CVPR2015/blob/master/blur.cpp
-        float sigma = 1.5f;
+        Image<uint8_t> out( Buffer(UInt(8), input.cols-2, input.rows-2, 1, 0, output.data ) );
 
         Var x, y, c;
-        Func kernel;
-        kernel(x) = exp(-x*x/(2*sigma*sigma)) / (sqrtf(2*M_PI)*sigma);
 
-        Func in_bounded = BoundaryConditions::repeat_edge(in);
+        // Blur it horizontally:
+        Func blur_x("blur_x");
+        blur_x(x, y, c) = (in(x-1, y, c) + 2 * in(x, y, c) + in(x+1, y, c)) / 4;
 
-        Func blur_y;
-        blur_y(x, y, c) = kernel(0) * in_bounded(x, y, c) + kernel(1) * (in_bounded(x, y-1, c) +
-                                                                         in_bounded(x, y+1, c));
+        // Blur it vertically:
+        Func blur_y("blur_y");
+        blur_y(x, y, c) = (blur_x(x, y-1, c) + 2 * blur_x(x, y, c) + blur_x(x, y+1, c)) / 4;
 
-        Func blur_x;
-        blur_x(x, y, c) = cast<uint8_t>((kernel(0) * blur_y(x, y, c) + kernel(1) * (blur_y(x-1, y, c) +
-                                                                      blur_y(x+1, y, c))));
-
-        // Schedule it.
-        blur_x.compute_root().vectorize(x, 8).parallel(y);
-        blur_y.compute_at(blur_x, y).vectorize(x, 8);
-
-        // Run
-        blur_x.realize(out);
+        out.set_min(1, 1);
+        blur_y.realize(out);
 
     }
 }
