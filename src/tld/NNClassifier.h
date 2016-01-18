@@ -38,29 +38,47 @@ using namespace cv;
 
 namespace tld {
 
-class NNClassifier {
-    float ncc(float const *f1, float const *f2);
+    class NNClassifier {
 
-public:
-	bool enabled;
+        public:
+            NNClassifier();
+            virtual ~NNClassifier();
 
-	int * windows;
-	float thetaFP;
-	float thetaTP;
-    std::shared_ptr<DetectionResult> detectionResult;
-    vector<NormalizedPatch> falsePositives;
-    vector<NormalizedPatch> truePositives;
+            void    release();
+            float   classifyPatch(NormalizedPatch const & patch);
+            float   classifyBB(Mat img, Rect &bb);
+            float   classifyWindow(Mat img, int windowIdx);
+            void    learn(vector<NormalizedPatch> const & patches);
+            bool    filter(Mat img, int windowIdx);
+            float   ncc(float const *f1, float const *f2);
 
-	NNClassifier();
-	virtual ~NNClassifier();
+            // Gets / Sets
+            inline bool isEnabled() const { return _enabled; }
+            inline float tp() const { return _thetaTP; }
+            inline float fp() const { return _thetaFP; }
+            void setTP(float th) { _thetaTP = th; }
+            void setFP(float th) { _thetaFP = th; }
 
-	void release();
-    float classifyPatch(NormalizedPatch & patch);
-    float classifyBB(Mat img, Rect &bb);
-	float classifyWindow(Mat img, int windowIdx);
-	void learn(vector<NormalizedPatch> &patches);
-	bool filter(Mat img, int windowIdx);
-};
+            vector<NormalizedPatch> const & truePositives() const { return _truePositives; }
+            vector<NormalizedPatch> const & falsePositives() const { return _falsePositives; }
+
+            void addTruePositive( NormalizedPatch const & patch) { _truePositives.push_back(patch); }
+            void addFalsePositive( NormalizedPatch const & patch) { _falsePositives.push_back(patch); }
+            void enable(bool status) { _enabled = status; }
+
+        public:
+            int * windows;
+            std::shared_ptr<DetectionResult> detectionResult;
+
+        private:
+            bool    _enabled;
+            float   _thetaFP;
+            float   _thetaTP;
+
+            vector<NormalizedPatch> _falsePositives;
+            vector<NormalizedPatch> _truePositives;
+
+    };
 
 } /* namespace tld */
 #endif /* NNCLASSIFIER_H_ */

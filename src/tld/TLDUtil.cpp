@@ -136,11 +136,14 @@ float tldBBOverlap(int *bb1, int *bb2) {
 	return intersection / (float)(area1 + area2 - intersection);
 }
 
-void tldOverlapOne(int * windows, int numWindows, int index, vector<int> & indices, vector<float> & overlap) {
+void tldOverlapOne(int * windows, int numWindows, int index, vector<int> const & indices, vector<float> & overlap) {
 
-    for(size_t i = 0; i < indices.size(); i++) {
+    overlap.clear();
+    overlap.reserve(indices.size());
 
-        overlap[i] = tldBBOverlap(&windows[TLD_WINDOW_SIZE*index], &windows[TLD_WINDOW_SIZE*indices[i]]);
+    for(auto const & i : indices) {
+
+        overlap.push_back( tldBBOverlap(&windows[TLD_WINDOW_SIZE*index], &windows[TLD_WINDOW_SIZE*i] ));
 	}
 }
 

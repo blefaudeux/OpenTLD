@@ -34,7 +34,8 @@ namespace tld {
 //TODO: Convert this to a function
 #define sub2idx(x,y,imgWidthStep) ((int) (floor((x)+0.5) + floor((y)+0.5)*(imgWidthStep)))
 
-DetectorCascade::DetectorCascade() {
+DetectorCascade::DetectorCascade()
+{
 	objWidth = -1; //MUST be set before calling init
 	objHeight = -1; //MUST be set before calling init
 	useShift = 1;
@@ -89,9 +90,9 @@ void DetectorCascade::propagateMembers() {
 	clustering->windows = windows;
 	clustering->numWindows = numWindows;
 
-	foregroundDetector->minBlobSize = minSize*minSize;
-
+    foregroundDetector->setMinBlobSize( minSize*minSize );
     foregroundDetector->detectionResult = detectionResult;
+
 	varianceFilter->detectionResult = detectionResult;
 	nnClassifier->detectionResult = detectionResult;
     clustering->detectionResult = detectionResult;
@@ -104,7 +105,7 @@ void DetectorCascade::release() {
 
 	initialised = false;
 
-	foregroundDetector->release();
+    foregroundDetector->releaseReferenceFrame();
 	ensembleClassifier->release();
 	nnClassifier->release();
 	

@@ -51,7 +51,7 @@ namespace tld {
             void writeToFile(const char * path);
             void readFromFile(const char * path);
             void drawDetection(IplImage * img) const;
-            Mat  drawPosterios();
+            Mat  drawPosteriors();
 
         public:
             // Get / Sets

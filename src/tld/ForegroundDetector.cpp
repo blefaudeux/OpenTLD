@@ -32,31 +32,36 @@ using namespace cv;
 namespace tld {
 
 ForegroundDetector::ForegroundDetector() {
-	fgThreshold = 16;
-	minBlobSize = 0;
+	_fgThreshold = 16;
+	_minBlobSize = 0;
 }
 
 ForegroundDetector::~ForegroundDetector() {
 }
 
-void ForegroundDetector::release() {
+void ForegroundDetector::releaseReferenceFrame() {
+    _bgImg.release();
+}
+
+void ForegroundDetector::setReferenceFrame( Mat const & ref ) {
+    _bgImg = ref.clone();
 }
 
 void ForegroundDetector::nextIteration(Mat img) {
-	if(bgImg.empty()) {
+	if(_bgImg.empty()) {
 		return;
 	}
 
 	Mat absImg = Mat(img.cols, img.rows, img.type());
 	Mat threshImg = Mat(img.cols, img.rows, img.type());
 
-	absdiff(bgImg, img, absImg);
-	threshold(absImg, threshImg, fgThreshold, 255, CV_THRESH_BINARY );
+	absdiff(_bgImg, img, absImg);
+	threshold(absImg, threshImg, _fgThreshold, 255, CV_THRESH_BINARY );
 
 	IplImage im = (IplImage)threshImg;
 	CBlobResult blobs = CBlobResult(&im, NULL, 0);
 
-	blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, minBlobSize );
+	blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, _minBlobSize );
 
     vector<Rect> & fgList = detectionResult->fgList;
     fgList.clear();
@@ -70,7 +75,7 @@ void ForegroundDetector::nextIteration(Mat img) {
 }
 
 bool ForegroundDetector::isActive() {
-	return !bgImg.empty();
+	return !_bgImg.empty();
 }
 
 } /* namespace tld */

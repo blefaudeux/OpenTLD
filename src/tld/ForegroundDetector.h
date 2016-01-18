@@ -37,19 +37,26 @@ using namespace cv;
 
 namespace tld {
 
-class ForegroundDetector {
-public:
-	int fgThreshold;
-	int minBlobSize;
-	Mat bgImg;
-    std::shared_ptr<DetectionResult> detectionResult;
+    class ForegroundDetector {
+        public:
+            ForegroundDetector();
+            virtual ~ForegroundDetector();
+            void nextIteration(Mat img);
+            bool isActive();
 
-	ForegroundDetector();
-	virtual ~ForegroundDetector();
-	void release();
-	void nextIteration(Mat img);
-	bool isActive();
-};
+            void setMinBlobSize( int minSize ) { _minBlobSize = minSize; }
+            void setReferenceFrame( Mat const & ref );
+            void releaseReferenceFrame();
+
+        public:
+            std::shared_ptr<DetectionResult> detectionResult;
+
+        private:
+            int _fgThreshold;
+            int _minBlobSize;
+            Mat _bgImg;
+
+    };
 
 } /* namespace tld */
 #endif /* FOREGROUNDDETECTOR_H_ */

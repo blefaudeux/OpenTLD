@@ -30,8 +30,8 @@
 namespace tld {
 
 NNClassifier::NNClassifier() {
-	thetaFP = .5;
-	thetaTP = .65;
+    _thetaFP = .5;
+    _thetaTP = .65;
 }
 
 NNClassifier::~NNClassifier() {
@@ -39,8 +39,8 @@ NNClassifier::~NNClassifier() {
 }
 
 void NNClassifier::release() {
-    falsePositives.clear();
-    truePositives.clear();
+    _falsePositives.clear();
+    _truePositives.clear();
 }
 
 float NNClassifier::ncc(float const * f1,float const * f2) {
@@ -60,20 +60,20 @@ float NNClassifier::ncc(float const * f1,float const * f2) {
 	return (corr / sqrt(norm1*norm2) + 1) / 2.0;
 }
 
-float NNClassifier::classifyPatch(NormalizedPatch & patch) {
-
-    if(truePositives.empty()) {
+float NNClassifier::classifyPatch(NormalizedPatch const & patch)
+{
+    if(_truePositives.empty()) {
 		return 0;
 	}
 
-    if(falsePositives.empty()) {
+    if(_falsePositives.empty()) {
 		return 1;
 	}
 
 	float ccorr_max_p = 0;
 
 	//Compare patch to positive patches
-    for (auto const & item : truePositives)
+    for (auto const & item : _truePositives)
     {
         float const ccorr = ncc( item.values, patch.values );
 
@@ -86,7 +86,7 @@ float NNClassifier::classifyPatch(NormalizedPatch & patch) {
 	float ccorr_max_n = 0;
 
 	//Compare patch to positive patches
-    for(auto const & item : falsePositives)
+    for(auto const & item : _falsePositives)
     {
         float const ccorr = ncc(item.values, patch.values);
 
@@ -120,30 +120,30 @@ float NNClassifier::classifyWindow(Mat img, int windowIdx) {
 }
 
 bool NNClassifier::filter(Mat img, int windowIdx) {
-	if(!enabled) return true;
+    if(!_enabled) return true;
 
 	float conf = classifyWindow(img, windowIdx);
 
-	if(conf < thetaTP) {
+    if(conf < _thetaTP) {
 		return false;
 	}
 
 	return true;
 }
 
-void NNClassifier::learn(vector<NormalizedPatch> & patches) {
+void NNClassifier::learn(vector<NormalizedPatch> const & patches) {
 	//TODO: Randomization might be a good idea here
 
-    for (auto & patch : patches)
+    for (auto const & patch : patches)
     {
         float conf = classifyPatch(patch);
 
-		if(patch.positive && conf <= thetaTP) {
-            truePositives.push_back(patch);
+        if(patch.positive && conf <= _thetaTP) {
+            _truePositives.push_back(patch);
 		}
 
-		if(!patch.positive && conf >= thetaFP) {
-            falsePositives.push_back(patch);
+        if(!patch.positive && conf >= _thetaFP) {
+            _falsePositives.push_back(patch);
 		}
 	}
 }

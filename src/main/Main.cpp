@@ -117,10 +117,10 @@
 
         if(!skipProcessingOnce) {
             // DEBUG: Ben - test Halide in there
-//            cv::blur(Mat(img),Mat(img),cv::Size(3,3));
+            cv::blur(Mat(img),Mat(img),cv::Size(3,3));
 
-            Mat img_out(img->width, img->height, CV_8UC1);
-            hexp::halide_blur_minimal(img_out, Mat(img));
+//            Mat img_out(img->width, img->height, CV_8UC1);
+//            hexp::halide_blur_minimal(img_out, Mat(img));
 
             tld->processImage(img);
 
@@ -184,7 +184,7 @@
                 //system(cmd.c_str());
                 tld->drawDetection(img);
                 cvRectangle(img,cvPoint(currBB->x, currBB->y),cvPoint(currBB->x + currBB->width, currBB->y + currBB->height),CV_RGB(0,255,255),2);
-                Mat img_desciptor = tld->drawPosterios();
+                Mat img_desciptor = tld->drawPosteriors();
                 Mat mat(img);
                 img_desciptor.copyTo(mat(cv::Rect(0,0,img_desciptor.cols,img_desciptor.rows)));
             }
@@ -213,13 +213,13 @@
                 {
                     auto fg = tld->detector()->foregroundDetector;
 
-                    if(fg->bgImg.empty())
+                    if(!fg->isActive())
                     {
-                        fg->bgImg = cvCloneImage(grey);
+                        fg->setReferenceFrame(grey);
                     }
                     else
                     {
-                        fg->bgImg.release();
+                        fg->releaseReferenceFrame();
                     }
                 }
 

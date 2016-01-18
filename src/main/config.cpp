@@ -410,7 +410,7 @@ int Config::configure(Main* main) {
     auto detectorCascade = main->tld->detector();
 	detectorCascade->varianceFilter->enabled = m_settings.m_varianceFilterEnabled;
 	detectorCascade->ensembleClassifier->enabled = m_settings.m_ensembleClassifierEnabled;
-	detectorCascade->nnClassifier->enabled = m_settings.m_nnClassifierEnabled;
+    detectorCascade->nnClassifier->enable ( m_settings.m_nnClassifierEnabled );
 
 	// classifier
 	detectorCascade->useShift = m_settings.m_useProportionalShift;
@@ -420,8 +420,8 @@ int Config::configure(Main* main) {
 	detectorCascade->minSize = m_settings.m_minSize;
 	detectorCascade->numTrees = m_settings.m_numTrees;
 	detectorCascade->numFeatures = m_settings.m_numFeatures;
-	detectorCascade->nnClassifier->thetaTP = m_settings.m_thetaP;
-	detectorCascade->nnClassifier->thetaFP = m_settings.m_thetaN;
+    detectorCascade->nnClassifier->setTP( m_settings.m_thetaP );
+    detectorCascade->nnClassifier->setFP( m_settings.m_thetaN );
 
 	return SUCCESS;
 }

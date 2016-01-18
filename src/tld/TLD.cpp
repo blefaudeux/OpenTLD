@@ -144,11 +144,11 @@ void TLD::fuseHypotheses() {
             currBB.reset( new Rect(*trackerBB.get()));
 			currConf = confTracker;
 
-            if(confTracker > nnClassifier->thetaTP)
+            if( confTracker > nnClassifier->tp() )
             {
 				valid = true;
-
-            } else if(wasValid && confTracker > nnClassifier->thetaFP)
+            }
+            else if(wasValid && confTracker > nnClassifier->fp())
             {
 				valid = true;
 			}
@@ -345,38 +345,38 @@ void TLD::writeToFile(const char * path) {
 	fprintf(file,"%d #width\n", detectorCascade->objWidth);
 	fprintf(file,"%d #height\n", detectorCascade->objHeight);
 	fprintf(file,"%f #min_var\n", detectorCascade->varianceFilter->minVar);
-    fprintf(file,"%d #Positive Sample Size\n", nn->truePositives.size());
 
 
-    for(size_t s = 0; s < nn->truePositives.size();s++) {
-        float * imageData =nn->truePositives[s].values;
-		for(int i = 0; i < TLD_PATCH_SIZE; i++) {
-			for(int j = 0; j < TLD_PATCH_SIZE; j++) {
-				fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
-			}
-			fprintf(file, "\n");
-		}
-	}
 
-    fprintf(file,"%d #Negative Sample Size\n", nn->falsePositives.size());
-
-    for(size_t s = 0; s < nn->falsePositives.size();s++)
+    auto printSample = [&file](NormalizedPatch const & p)
     {
-        float * imageData = nn->falsePositives[s].values;
-        for(int i = 0; i < TLD_PATCH_SIZE; i++)
-        {
-            for(int j = 0; j < TLD_PATCH_SIZE; j++)
-            {
-				fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
-			}
-			fprintf(file, "\n");
-		}
+        float const * imageData = p.values;
+        for(int i = 0; i < TLD_PATCH_SIZE; i++) {
+            for(int j = 0; j < TLD_PATCH_SIZE; j++) {
+                fprintf(file, "%f ", imageData[i*TLD_PATCH_SIZE+j]);
+            }
+            fprintf(file, "\n");
+        }
+    };
+
+    fprintf(file,"%d #Positive Sample Size\n", nn->truePositives().size());
+    for( auto const & s : nn->truePositives())
+    {
+        printSample(s);
 	}
+
+    fprintf(file,"%d #Negative Sample Size\n", nn->falsePositives().size());
+    for (auto const & s : nn->falsePositives())
+    {
+        printSample(s);
+    }
 
     fprintf(file,"%d #numtrees\n", ec->dtc.numTrees);
     detectorCascade->numTrees = ec->dtc.numTrees;
+
     fprintf(file,"%d #numFeatures\n", ec->dtc.numFeatures);
     detectorCascade->numFeatures = ec->dtc.numFeatures;
+
     for(int i = 0; i < ec->dtc.numTrees; i++) {
 		fprintf(file, "#Tree %d\n", i);
 
@@ -400,14 +400,12 @@ void TLD::writeToFile(const char * path) {
 		}
 
 		fprintf(file,"%d #numLeaves\n", list.size());
-		for(size_t j = 0; j < list.size(); j++) {
-			TldExportEntry entry = list.at(j);
+        for(auto const & entry : list) {
 			fprintf(file,"%d %d %d\n", entry.index, entry.P, entry.N);
 		}
 	}
 
 	fclose(file);
-
 }
 
 void TLD::readFromFile(const char * path) {
@@ -461,7 +459,7 @@ void TLD::readFromFile(const char * path) {
 			}
 		}
 
-        nn->truePositives.push_back(patch);
+        nn->addTruePositive( patch );
 	}
 
 	int numNegativePatches;
@@ -489,7 +487,7 @@ void TLD::readFromFile(const char * path) {
 			}
 		}
 
-        nn->falsePositives.push_back(patch);
+        nn->addFalsePositive( patch );
 	}
 
     fscanf(file,"%d \n", &ec->dtc.numTrees);
@@ -500,7 +498,7 @@ void TLD::readFromFile(const char * path) {
     detectorCascade->numFeatures = ec->dtc.numFeatures;
 	fgets(str_buf, MAX_LEN, file); /*Skip rest of line*/
 
-    int size = 2 * 2 * ec->dtc.numFeatures * ec->dtc.numTrees;
+    int const size = 2 * 2 * ec->dtc.numFeatures * ec->dtc.numTrees;
 	ec->features = new float[size];
     ec->numIndices = pow(2.0f, ec->dtc.numFeatures);
 	ec->initPosteriors();
@@ -529,13 +527,10 @@ void TLD::readFromFile(const char * path) {
 
 	detectorCascade->initWindowsAndScales();
 	detectorCascade->initWindowOffsets();
-
 	detectorCascade->propagateMembers();
-
 	detectorCascade->initialised = true;
 
 	ec->initFeatureOffsets();
-
 }
 
 static void hsv2rgb(double h,double s,double v,unsigned char *R,unsigned char*G,unsigned char *B) {
@@ -587,7 +582,7 @@ static CvScalar * DRAW_vector_map(int size) {
 	return &COLOR[0];
 }
 
-Mat TLD::drawPosterios() {
+Mat TLD::drawPosteriors() {
     int T = detectorCascade->numTrees;
 	int I = detectorCascade->ensembleClassifier->numIndices;
 	if(_img_posterios == NULL) {
