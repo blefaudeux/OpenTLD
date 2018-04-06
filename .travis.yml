@@ -1,21 +1,17 @@
 language: cpp
-sudo: false
+
 compiler:
-  - g++
   - clang
 
 script:
   - mkdir build
   - cd build
   - cmake ..
-  - make all
+  - make
 
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
     packages:
-    - g++
     - libopencv-dev
     - libcv-dev
 
